@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-3.0.xsd
+         http://www.springframework.org/schema/mvc
+         http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+         
+ 	<!-- <bean id="testController" class="com.nciae.parking.controller.TestController">
+ 	    <property name="userCarDaoImpl" ref="userCarDaoImpl" />
+ 	</bean> -->
+	
+ 	<bean id="usersController" class="com.nciae.community.controller.UsersController">
+ 	    <property name="usersDaoImpl" ref="usersDaoImpl" />
+ 	</bean>
+ 	<bean id="uploadController" class="com.nciae.community.controller.UploadController">
+ 	    <property name="usersDaoImpl" ref="usersDaoImpl" />
+ 	</bean>
+ 	<bean id="memberController" class="com.nciae.community.controller.MemberController">
+ 	    <property name="memberDaoImpl" ref="memberDaoImpl" />
+ 	    <property name="dailyAbcDaoImpl" ref="dailyAbcDaoImpl" />
+ 	    <property name="happyMomentDaoImpl" ref="happyMomentDaoImpl" />
+ 	</bean>
+ 	<bean id="propertyController" class="com.nciae.community.controller.PropertyController">
+ 	    <property name="propertyDaoImpl" ref="propertyDaoImpl" />
+ 	</bean>
+ 	<bean id="adminUserController" class="com.nciae.community.controller.AdminUserController">
+ 	    <property name="usersDaoImpl" ref="usersDaoImpl" />
+ 	    <property name="cityDaoImpl" ref="cityDaoImpl" />
+ 	    <property name="communityDaoImpl" ref="communityDaoImpl" />
+ 	    <property name="replyDaoImpl" ref="replyDaoImpl" />
+ 	    <property name="dailyAbcDaoImpl" ref="dailyAbcDaoImpl" />
+ 	    <property name="advertisementDaoImpl" ref="advertisementDaoImpl" />
+ 	    <property name="happyMomentDaoImpl" ref="happyMomentDaoImpl" />
+		<property name="propertyDaoImpl" ref="propertyDaoImpl" />
+ 	</bean>
+ 	<bean id="uploadController2" class="com.nciae.community.controller.UploadController2">
+ 	    <property name="usersDaoImpl" ref="usersDaoImpl" />
+ 	</bean>
+ 	<bean id="uploadAdController" class="com.nciae.community.controller.UploadAdController">
+ 	    <property name="advertisementDaoImpl" ref="advertisementDaoImpl" />
+ 	</bean>
+ 	
+ 	<bean id="dailyAbcTimerTask" class="com.nciae.community.utils.DailyAbcTimerTask">
+	 	<property name="dailyAbcDaoImpl" ref="dailyAbcDaoImpl" />
+	 </bean>
+	 
+	 <bean id="happyMomentTimerTask" class="com.nciae.community.utils.HappyMomentTimerTask">
+	 	<property name="happyMomentDaoImpl" ref="happyMomentDaoImpl" />
+	 </bean>
+</beans>         
