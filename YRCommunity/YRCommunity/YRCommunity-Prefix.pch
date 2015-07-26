@@ -1,0 +1,43 @@
+//
+//  YRCommunity-Prefix.pch
+//  YRCommunity
+//
+//  Created by windear on 15-7-17.
+//  Copyright (c) 2015年 Mr.Xu. All rights reserved.
+//
+
+#ifndef YRCommunity_YRCommunity_Prefix_pch
+#define YRCommunity_YRCommunity_Prefix_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#import"AFHTTPRequestOperationManager.h"
+
+// 自定义Log
+#ifdef DEBUG // 调试
+#define MyLog(...) NSLog(__VA_ARGS__)
+#else // 发布打包
+#define MyLog(...)
+#endif
+
+
+#define DEVICE_IS_IPHONE5 ([[UIScreen mainScreen] bounds].size.height == 568)
+#define NAVIGATIONHIDDEN self.navigationController.navigationBarHidden
+#define iOS7  ( [[[UIDevice currentDevice] systemVersion] integerValue] >= 7.0 )
+#define SHOWFRAME CGRectMake(0, 382, 320, 100)
+#define DISAPPEAR CGRectMake(0, 480, 320, 100)
+#define HEIGHT [UIScreen mainScreen ].bounds.size.height
+#define WIDTH [UIScreen mainScreen ].bounds.size.width
+#define NavigationHeight (iOS7?64:44)
+#define iPhone ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+#define g_App ((AppDelegate*)[[UIApplication sharedApplication] delegate])
+
+
+
+#define YRan_URL @"http://211.99.254.114/QMBJoinApp"
+
+#define kgetInit @"/init/getInit"
+
+
+#endif
