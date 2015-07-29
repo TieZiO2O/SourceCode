@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		298301881B691F9E00F77335 /* YRLifeInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 298301871B691F9E00F77335 /* YRLifeInfoCell.m */; };
 		29E059121B633786006BB61D /* UIView+CustomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E059111B633786006BB61D /* UIView+CustomView.m */; };
 		29E0593D1B63397A006BB61D /* YRHomeCarouselCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E0593C1B63397A006BB61D /* YRHomeCarouselCell.m */; };
 		29E059411B6339D2006BB61D /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E059401B6339D2006BB61D /* iCarousel.m */; };
@@ -362,6 +363,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		298301861B691F9E00F77335 /* YRLifeInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRLifeInfoCell.h; sourceTree = "<group>"; };
+		298301871B691F9E00F77335 /* YRLifeInfoCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRLifeInfoCell.m; sourceTree = "<group>"; };
 		29E059101B633786006BB61D /* UIView+CustomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+CustomView.h"; sourceTree = "<group>"; };
 		29E059111B633786006BB61D /* UIView+CustomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+CustomView.m"; sourceTree = "<group>"; };
 		29E0593B1B63397A006BB61D /* YRHomeCarouselCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRHomeCarouselCell.h; sourceTree = "<group>"; };
@@ -806,6 +809,8 @@
 				29E0593C1B63397A006BB61D /* YRHomeCarouselCell.m */,
 				29E059461B634366006BB61D /* YRTenementInfoCell.h */,
 				29E059471B634366006BB61D /* YRTenementInfoCell.m */,
+				298301861B691F9E00F77335 /* YRLifeInfoCell.h */,
+				298301871B691F9E00F77335 /* YRLifeInfoCell.m */,
 			);
 			path = PropertyView;
 			sourceTree = "<group>";
@@ -1820,6 +1825,7 @@
 				2A759ACF1B5FA4600028E891 /* SBJsonWriter.m in Sources */,
 				2A759AA31B5F877B0028E891 /* BaseViewController.m in Sources */,
 				2A7C19D81B58E0EA00AEC5DA /* main.m in Sources */,
+				298301881B691F9E00F77335 /* YRLifeInfoCell.m in Sources */,
 				29E059481B634366006BB61D /* YRTenementInfoCell.m in Sources */,
 				2A759ACE1B5FA4600028E891 /* SBJsonUTF8Stream.m in Sources */,
 				2A759AC81B5FA4600028E891 /* SBJsonStreamParserAdapter.m in Sources */,

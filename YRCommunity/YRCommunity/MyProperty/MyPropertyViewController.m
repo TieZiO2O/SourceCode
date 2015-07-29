@@ -9,10 +9,12 @@
 #import "MyPropertyViewController.h"
 #import "YRHomeCarouselCell.h"
 #import "YRTenementInfoCell.h"
-
+#import "YRLifeInfoCell.h"
 typedef enum :NSInteger{
     YRHomeCarouselSection,
     YRtenementInfoSection,
+    YRJokeSection,
+    YRCommonSenceSection,
     YRHomeSectionCount
 }YRTableSection;
 
@@ -68,10 +70,14 @@ typedef enum :NSInteger{
             
             return [YRHomeCarouselCell defaultHeight];
             
-            case YRtenementInfoSection:
+        case YRtenementInfoSection:
             return [YRTenementInfoCell defaultHeight];
-        default:
-            break;
+        case YRJokeSection:
+            return [YRLifeInfoCell defaultHeight];
+        case YRCommonSenceSection:
+            return [YRLifeInfoCell defaultHeight];
+            
+            
     }
     return 0;
 }
@@ -108,11 +114,26 @@ typedef enum :NSInteger{
             return cell;
 
         }
+        case YRJokeSection:
+        {
+            static NSString * identifier = @"lifeJokeSection";
+            YRLifeInfoCell * cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+            if (cell == nil) {
+                cell = [[YRLifeInfoCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+            }
+            return cell;
             
-            break;
+        }
+        case YRCommonSenceSection:
+        {
+            static NSString * identifier = @"commonSencseSection";
+            YRLifeInfoCell * cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+            if (cell == nil) {
+                cell = [[YRLifeInfoCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+            }
+            return cell;
+        }
             
-        default:
-            break;
     }
     return nil;
 }
@@ -124,8 +145,10 @@ typedef enum :NSInteger{
            return  0;
             case YRtenementInfoSection:
             return 20;
-        default:
-            break;
+            case YRJokeSection:
+            return 20;
+            case YRCommonSenceSection:
+            return 0;
     }
     return 0;
 }
