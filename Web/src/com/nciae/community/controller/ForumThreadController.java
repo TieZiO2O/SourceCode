@@ -1,8 +1,10 @@
 package com.nciae.community.controller;
 
+import java.beans.Encoder;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -15,8 +17,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONString;
 
+import org.apache.tomcat.util.buf.Utf8Encoder;
+import org.apache.tomcat.util.codec.EncoderException;
+import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -26,29 +33,60 @@ import org.springframework.web.multipart.MultipartRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import com.nciae.community.dao.impl.ForumThreadDaoImpl;
 import com.nciae.community.domain.ForumThreads;
+import com.nciae.community.utils.JsonUtil;
 
 @Controller
 @RequestMapping("/forumThreads")
 public class ForumThreadController {
 	private ForumThreadDaoImpl forumThreadDaoImpl;
 	
+	/*
+	 * 增加新帖
+	 * 需要参数：tile,帖子题目；content,帖子内容；phone,电话号码；uid,当前添加新帖用的id
+	 * */
 	@RequestMapping(value="add")
 	public void addNew(HttpServletRequest request,HttpServletResponse response,PrintWriter pw){
 		//创建一个通用的同部分解析器
 		String guid=UUID.randomUUID().toString();
+		String content=request.getParameter("content");
+		String title=request.getParameter("title");
+		
+		JSONObject json=new JSONObject();
+		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+		if(title==""){
+			json.put("result", "帖子标题不能为空");
+			pw.write(json.toString());
+			return;
+		}
 		
 		ForumThreads ft=new ForumThreads();
+		
+		if(content==""){
+			ft.setContent("");
+		}else{
+			try {
+				ft.setContent(new String(base64.encode(content.getBytes("utf-8"))));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		ft.setGuid(guid);
 		ft.setCreateDate(new Date());
-		ft.setContent(org.apache.commons.codec.binary.Base64.encodeBase64String(request.getParameter("content").getBytes()));
-		ft.setTitle(org.apache.commons.codec.binary.Base64.encodeBase64String(request.getParameter("title").getBytes()));
+		try {
+			ft.setTitle(new String(base64.encode(title.getBytes("utf-8"))));
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		ft.setPhone(request.getParameter("phone"));
 		
 		try {
 			boolean isAdd=this.forumThreadDaoImpl.addNewForumThread(ft);
-			JSONObject json=new JSONObject();
 			if(!isAdd){
 				json.put("result", "fail");
 				pw.write(json.toString());
@@ -81,6 +119,12 @@ public class ForumThreadController {
 	public String listTo(){
 		return "forumThreads/list";
 	}
+	
+	@RequestMapping(value="query",method=RequestMethod.POST)
+	public String toQuery(){
+		return "forumThreads/query";
+	}
+	
 	//保存所有上传的图片并返回所有保存后的图片的url地址数组
 	public ArrayList<String> saveAllImgs(HttpServletRequest request,String guid){
 		CommonsMultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
@@ -140,6 +184,50 @@ public class ForumThreadController {
 		return imgs;
 	}
 
+	@RequestMapping(value="getOneByGuid")
+	public void getOne(String guid,HttpServletResponse response,PrintWriter pw){
+		
+		JSONObject json=new JSONObject();
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset:utf-8");
+		
+		if(guid==""){
+			json.put("result", "fail");
+			json.put("info", "传递的参数不能为空");
+			pw.write(json.toString());
+			return;
+		}
+		
+		ForumThreads ft=this.forumThreadDaoImpl.queryByGuid(guid);
+		json.put("result", "success");
+		json.put("info", ft);
+		pw.write(json.toString());
+		return;
+	}
+	
+	@RequestMapping("getAllByUid")
+	public void getAll(String uid,HttpServletResponse response,PrintWriter pw){
+		JSONObject json=new JSONObject();
+		ArrayList<ForumThreads> fts=null;
+
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset:utf-8");
+		
+		if(uid==""){
+			json.put("result", "fail");
+			json.put("info", "参数用户Id不能为空");
+			pw.write(json.toString());
+			return;
+		}
+		
+		fts=this.forumThreadDaoImpl.queryAllByUid(uid);
+		
+		json.put("result", "success");
+		json.put("info", fts);
+		pw.write(json.toString());
+		System.out.println(fts.get(0).getContent());
+		return;
+	}
 	public ForumThreadDaoImpl getForumThreadDaoImpl() {
 		return forumThreadDaoImpl;
 	}

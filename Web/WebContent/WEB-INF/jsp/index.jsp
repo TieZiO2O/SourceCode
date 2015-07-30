@@ -152,6 +152,9 @@
 			</table>
 		</form>
 		<form action="forumThreads/list.do" method="POST">
+			<input type="submit" value="添加"/>
+		</form>
+		<form action="forumThreads/query.do" method="POST">
 			<input type="submit" value="提交"/>
 		</form>
 	</center>

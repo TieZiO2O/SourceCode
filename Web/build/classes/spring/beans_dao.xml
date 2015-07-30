@@ -22,5 +22,7 @@
 	<bean id="dailyAbcDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.DailyAbcDaoImpl" /> 
 	<bean id="advertisementDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.AdvertisementDaoImpl" />
 	<bean id="happyMomentDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.HappyMomentDaoImpl" />  
-	<bean id="forumThreadDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.ForumThreadDaoImpl"></bean>
+	<bean id="forumThreadDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.ForumThreadDaoImpl">
+		<property name="webUrl" value="http://localhost:8080/Community"/>
+	</bean>
 </beans>         

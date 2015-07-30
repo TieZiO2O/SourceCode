@@ -9,6 +9,7 @@
 <body>
 	<form action="add.do" method="POST" enctype="multipart/form-data">
 		<input type="file" name="img"/>
+		<input type="file" name="image"/>
 		题目：<input type="text" name="title"/>
 		内容：<input type="text" name="content"/>
 		phone:<input type="text" name="phone">

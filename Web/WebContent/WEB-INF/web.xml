@@ -42,5 +42,4 @@
 	<listener>
 		<listener-class>com.nciae.community.utils.CommunityServletContextListener</listener-class>
 	</listener>
-  
 </web-app>
