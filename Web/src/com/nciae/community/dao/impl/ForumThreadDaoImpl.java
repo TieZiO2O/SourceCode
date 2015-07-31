@@ -164,6 +164,37 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 		return isTrue;
 	}
 
+	public boolean addNewUser_ForumThread(ForumThreads forumThread) throws Exception {
+		// TODO Auto-generated method stub
+		PreparedStatement ps=null;
+		boolean isTrue=true;
+		try {
+			String dateNow=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+			String sql="insert into users_forumthreads(userid,forumThreadsGuid,createDate) values(?,?,?)";
+			ps=dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(2, forumThread.getGuid());
+			ps.setString(1, forumThread.getUid());
+			ps.setDate(3, new java.sql.Date(new Date().getTime()));
+			
+			int reuslt=ps.executeUpdate();
+			
+			if(reuslt>0){
+				isTrue=true;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			isTrue=false;
+		}finally{
+			dbServiceImpl.close();
+			if(ps!=null){
+				ps.close();
+			}
+		}
+		return isTrue;
+	}
+
+	
 	@Override
 	public boolean addForumImgs(ArrayList<String> imgPaths,String guid) {
 		// TODO Auto-generated method stub

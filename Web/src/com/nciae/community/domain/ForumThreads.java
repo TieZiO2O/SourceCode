@@ -5,6 +5,10 @@ import java.util.Date;
 
 public class ForumThreads {
 	private int id;
+	/*
+	 * 帖子用户的id
+	 * */
+	private String uid;
 	private String guid;
 	private String title;
 	private String content;
@@ -53,10 +57,18 @@ public class ForumThreads {
 	public void setCreateDate(Date createDate) {
 		this.createDate = createDate;
 	}
+	public String getUid() {
+		return uid;
+	}
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
 	@Override
 	public String toString() {
-		return "ForumThreads [id=" + id + ", guid=" + guid + ", title=" + title
-				+ ", content=" + content + ", phone=" + phone + ", createDate="
-				+ createDate + ", images=" + images + "]";
+		return "ForumThreads [id=" + id + ", uid=" + uid + ", guid=" + guid
+				+ ", title=" + title + ", content=" + content + ", phone="
+				+ phone + ", createDate=" + createDate + ", images=" + images
+				+ "]";
 	}
+
 }

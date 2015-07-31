@@ -53,6 +53,7 @@ public class ForumThreadController {
 		String guid=UUID.randomUUID().toString();
 		String content=request.getParameter("content");
 		String title=request.getParameter("title");
+		String uid=request.getParameter("uid");
 		
 		JSONObject json=new JSONObject();
 		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
@@ -75,6 +76,7 @@ public class ForumThreadController {
 			}
 		}
 		
+		ft.setUid(uid);
 		ft.setGuid(guid);
 		ft.setCreateDate(new Date());
 		try {
@@ -87,6 +89,8 @@ public class ForumThreadController {
 		
 		try {
 			boolean isAdd=this.forumThreadDaoImpl.addNewForumThread(ft);
+			isAdd=this.forumThreadDaoImpl.addNewUser_ForumThread(ft);
+			
 			if(!isAdd){
 				json.put("result", "fail");
 				pw.write(json.toString());
