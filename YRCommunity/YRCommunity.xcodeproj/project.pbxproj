@@ -7,7 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		297E1F531B6CC9EE00E074C7 /* YRPersonalCenterCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 297E1F521B6CC9EE00E074C7 /* YRPersonalCenterCell.m */; };
+		297E1F561B6DCE2700E074C7 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 297E1F551B6DCE2700E074C7 /* LoginViewController.m */; };
+		297E1F591B6DEF2200E074C7 /* RegisterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 297E1F581B6DEF2200E074C7 /* RegisterViewController.m */; };
+		297E1F601B6DF86600E074C7 /* AboutYRViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 297E1F5E1B6DF86600E074C7 /* AboutYRViewController.m */; };
+		297E1F611B6DF86600E074C7 /* AboutYRViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 297E1F5F1B6DF86600E074C7 /* AboutYRViewController.xib */; };
+		297E1F671B6E647700E074C7 /* YRUserObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 297E1F661B6E647700E074C7 /* YRUserObject.m */; };
+		297E1F6E1B6E69E700E074C7 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 297E1F6A1B6E69E700E074C7 /* MBProgressHUD.m */; };
+		297E1F6F1B6E69E700E074C7 /* MBProgressHUD+CMBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 297E1F6D1B6E69E700E074C7 /* MBProgressHUD+CMBProgressHUD.m */; };
 		298301881B691F9E00F77335 /* YRLifeInfoCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 298301871B691F9E00F77335 /* YRLifeInfoCell.m */; };
+		298524051B6A82C200F07C5D /* YRPersonCenterHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 298524041B6A82C200F07C5D /* YRPersonCenterHeaderCell.m */; };
 		29E059121B633786006BB61D /* UIView+CustomView.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E059111B633786006BB61D /* UIView+CustomView.m */; };
 		29E0593D1B63397A006BB61D /* YRHomeCarouselCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E0593C1B63397A006BB61D /* YRHomeCarouselCell.m */; };
 		29E059411B6339D2006BB61D /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = 29E059401B6339D2006BB61D /* iCarousel.m */; };
@@ -363,8 +372,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		297E1F511B6CC9EE00E074C7 /* YRPersonalCenterCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRPersonalCenterCell.h; path = ../YRPersonalCenterCell.h; sourceTree = "<group>"; };
+		297E1F521B6CC9EE00E074C7 /* YRPersonalCenterCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRPersonalCenterCell.m; path = ../YRPersonalCenterCell.m; sourceTree = "<group>"; };
+		297E1F541B6DCE2700E074C7 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoginViewController.h; path = ../LoginViewController.h; sourceTree = "<group>"; };
+		297E1F551B6DCE2700E074C7 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoginViewController.m; path = ../LoginViewController.m; sourceTree = "<group>"; };
+		297E1F571B6DEF2200E074C7 /* RegisterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RegisterViewController.h; path = ../RegisterViewController.h; sourceTree = "<group>"; };
+		297E1F581B6DEF2200E074C7 /* RegisterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RegisterViewController.m; path = ../RegisterViewController.m; sourceTree = "<group>"; };
+		297E1F5D1B6DF86600E074C7 /* AboutYRViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AboutYRViewController.h; path = ../AboutYRViewController.h; sourceTree = "<group>"; };
+		297E1F5E1B6DF86600E074C7 /* AboutYRViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AboutYRViewController.m; path = ../AboutYRViewController.m; sourceTree = "<group>"; };
+		297E1F5F1B6DF86600E074C7 /* AboutYRViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AboutYRViewController.xib; path = ../AboutYRViewController.xib; sourceTree = "<group>"; };
+		297E1F651B6E647700E074C7 /* YRUserObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRUserObject.h; sourceTree = "<group>"; };
+		297E1F661B6E647700E074C7 /* YRUserObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRUserObject.m; sourceTree = "<group>"; };
+		297E1F691B6E69E700E074C7 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
+		297E1F6A1B6E69E700E074C7 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		297E1F6C1B6E69E700E074C7 /* MBProgressHUD+CMBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MBProgressHUD+CMBProgressHUD.h"; sourceTree = "<group>"; };
+		297E1F6D1B6E69E700E074C7 /* MBProgressHUD+CMBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MBProgressHUD+CMBProgressHUD.m"; sourceTree = "<group>"; };
 		298301861B691F9E00F77335 /* YRLifeInfoCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRLifeInfoCell.h; sourceTree = "<group>"; };
 		298301871B691F9E00F77335 /* YRLifeInfoCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YRLifeInfoCell.m; sourceTree = "<group>"; };
+		298524031B6A82C200F07C5D /* YRPersonCenterHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YRPersonCenterHeaderCell.h; path = ../YRPersonCenterHeaderCell.h; sourceTree = "<group>"; };
+		298524041B6A82C200F07C5D /* YRPersonCenterHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YRPersonCenterHeaderCell.m; path = ../YRPersonCenterHeaderCell.m; sourceTree = "<group>"; };
 		29E059101B633786006BB61D /* UIView+CustomView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+CustomView.h"; sourceTree = "<group>"; };
 		29E059111B633786006BB61D /* UIView+CustomView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+CustomView.m"; sourceTree = "<group>"; };
 		29E0593B1B63397A006BB61D /* YRHomeCarouselCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YRHomeCarouselCell.h; sourceTree = "<group>"; };
@@ -677,9 +703,9 @@
 		2A7C19F11B58E0EB00AEC5DA /* YRCommunityTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YRCommunityTests.m; sourceTree = "<group>"; };
 		2A7C19FE1B58E51500AEC5DA /* YRCommunity-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "YRCommunity-Prefix.pch"; sourceTree = "<group>"; };
 		2A7C19FF1B58E5C200AEC5DA /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		2A7C1A141B58E75200AEC5DA /* PersonalCenterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PersonalCenterViewController.h; sourceTree = "<group>"; };
-		2A7C1A151B58E75200AEC5DA /* PersonalCenterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PersonalCenterViewController.m; sourceTree = "<group>"; };
-		2A7C1A161B58E75200AEC5DA /* PersonalCenterViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PersonalCenterViewController.xib; sourceTree = "<group>"; };
+		2A7C1A141B58E75200AEC5DA /* PersonalCenterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PersonalCenterViewController.h; path = ../PersonalCenterViewController.h; sourceTree = "<group>"; };
+		2A7C1A151B58E75200AEC5DA /* PersonalCenterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PersonalCenterViewController.m; path = ../PersonalCenterViewController.m; sourceTree = "<group>"; };
+		2A7C1A161B58E75200AEC5DA /* PersonalCenterViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PersonalCenterViewController.xib; path = ../PersonalCenterViewController.xib; sourceTree = "<group>"; };
 		2A7C1A181B58E75200AEC5DA /* MyPropertyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyPropertyViewController.h; sourceTree = "<group>"; };
 		2A7C1A191B58E75200AEC5DA /* MyPropertyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyPropertyViewController.m; sourceTree = "<group>"; };
 		2A7C1A2C1B58F43000AEC5DA /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
@@ -790,6 +816,61 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		297E1F621B6E63C600E074C7 /* controller */ = {
+			isa = PBXGroup;
+			children = (
+				297E1F5E1B6DF86600E074C7 /* AboutYRViewController.m */,
+				2A7C1A141B58E75200AEC5DA /* PersonalCenterViewController.h */,
+				297E1F5D1B6DF86600E074C7 /* AboutYRViewController.h */,
+				297E1F5F1B6DF86600E074C7 /* AboutYRViewController.xib */,
+				297E1F541B6DCE2700E074C7 /* LoginViewController.h */,
+				297E1F551B6DCE2700E074C7 /* LoginViewController.m */,
+				297E1F571B6DEF2200E074C7 /* RegisterViewController.h */,
+				297E1F581B6DEF2200E074C7 /* RegisterViewController.m */,
+				2A7C1A151B58E75200AEC5DA /* PersonalCenterViewController.m */,
+				2A7C1A161B58E75200AEC5DA /* PersonalCenterViewController.xib */,
+			);
+			path = controller;
+			sourceTree = "<group>";
+		};
+		297E1F631B6E63C600E074C7 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				297E1F651B6E647700E074C7 /* YRUserObject.h */,
+				297E1F661B6E647700E074C7 /* YRUserObject.m */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
+		297E1F641B6E63C600E074C7 /* view */ = {
+			isa = PBXGroup;
+			children = (
+				298524031B6A82C200F07C5D /* YRPersonCenterHeaderCell.h */,
+				298524041B6A82C200F07C5D /* YRPersonCenterHeaderCell.m */,
+				297E1F511B6CC9EE00E074C7 /* YRPersonalCenterCell.h */,
+				297E1F521B6CC9EE00E074C7 /* YRPersonalCenterCell.m */,
+			);
+			path = view;
+			sourceTree = "<group>";
+		};
+		297E1F681B6E69E700E074C7 /* MBProgressHUD */ = {
+			isa = PBXGroup;
+			children = (
+				297E1F691B6E69E700E074C7 /* MBProgressHUD.h */,
+				297E1F6A1B6E69E700E074C7 /* MBProgressHUD.m */,
+			);
+			path = MBProgressHUD;
+			sourceTree = "<group>";
+		};
+		297E1F6B1B6E69E700E074C7 /* MBProgressHUDEx */ = {
+			isa = PBXGroup;
+			children = (
+				297E1F6C1B6E69E700E074C7 /* MBProgressHUD+CMBProgressHUD.h */,
+				297E1F6D1B6E69E700E074C7 /* MBProgressHUD+CMBProgressHUD.m */,
+			);
+			path = MBProgressHUDEx;
+			sourceTree = "<group>";
+		};
 		29E0590F1B633786006BB61D /* Category */ = {
 			isa = PBXGroup;
 			children = (
@@ -1228,9 +1309,9 @@
 		2A7C1A131B58E75200AEC5DA /* PersonalCenter */ = {
 			isa = PBXGroup;
 			children = (
-				2A7C1A141B58E75200AEC5DA /* PersonalCenterViewController.h */,
-				2A7C1A151B58E75200AEC5DA /* PersonalCenterViewController.m */,
-				2A7C1A161B58E75200AEC5DA /* PersonalCenterViewController.xib */,
+				297E1F621B6E63C600E074C7 /* controller */,
+				297E1F631B6E63C600E074C7 /* model */,
+				297E1F641B6E63C600E074C7 /* view */,
 			);
 			path = PersonalCenter;
 			sourceTree = "<group>";
@@ -1258,11 +1339,13 @@
 		2A7C1A2A1B58F43000AEC5DA /* Lib */ = {
 			isa = PBXGroup;
 			children = (
+				297E1F681B6E69E700E074C7 /* MBProgressHUD */,
+				297E1F6B1B6E69E700E074C7 /* MBProgressHUDEx */,
+				2A7C1A2B1B58F43000AEC5DA /* AFNetworking */,
 				29E0593E1B6339D2006BB61D /* iCarousel */,
 				29E0590F1B633786006BB61D /* Category */,
 				2A759AAA1B5FA4600028E891 /* SBJson */,
 				4CEE34CA1B5B906200B26121 /* RDVTabBarController */,
-				2A7C1A2B1B58F43000AEC5DA /* AFNetworking */,
 				2A7C1A3F1B58F43000AEC5DA /* EGOTableViewPullRefresh */,
 				2A7C1A521B58F43000AEC5DA /* UIKit+AFNetworking */,
 			);
@@ -1754,6 +1837,7 @@
 				2A7599E41B5F7A920028E891 /* ic_pulltorefresh_arrow 2.png in Resources */,
 				2A7599EB1B5F7A920028E891 /* lead_01.9 2.png in Resources */,
 				2A759A851B5F7A920028E891 /* publicity.9.png in Resources */,
+				297E1F611B6DF86600E074C7 /* AboutYRViewController.xib in Resources */,
 				4CEE34F31B5B922A00B26121 /* second_selected@2x.png in Resources */,
 				2A759A0D1B5F7A920028E891 /* main_personal_bar1.png in Resources */,
 				2A759A491B5F7A920028E891 /* mykaisuo.png in Resources */,
@@ -1795,6 +1879,7 @@
 				2A7C1A221B58E75200AEC5DA /* PersonalCenterViewController.m in Sources */,
 				29E059441B633ACD006BB61D /* UIColor+Utilities.m in Sources */,
 				2A6669B41B5CD711007A1354 /* LifeServicesTableViewCell0.m in Sources */,
+				297E1F591B6DEF2200E074C7 /* RegisterViewController.m in Sources */,
 				2A759ACB1B5FA4600028E891 /* SBJsonStreamWriterAccumulator.m in Sources */,
 				2A7C1A701B58F43000AEC5DA /* PullTableView.m in Sources */,
 				29E059411B6339D2006BB61D /* iCarousel.m in Sources */,
@@ -1812,7 +1897,10 @@
 				2A7C1A7A1B58F43000AEC5DA /* UIActivityIndicatorView+AFNetworking.m in Sources */,
 				2A759ACD1B5FA4600028E891 /* SBJsonTokeniser.m in Sources */,
 				2A7C19DB1B58E0EA00AEC5DA /* AppDelegate.m in Sources */,
+				297E1F531B6CC9EE00E074C7 /* YRPersonalCenterCell.m in Sources */,
+				297E1F601B6DF86600E074C7 /* AboutYRViewController.m in Sources */,
 				2A7C1A801B58F43000AEC5DA /* UIWebView+AFNetworking.m in Sources */,
+				297E1F6F1B6E69E700E074C7 /* MBProgressHUD+CMBProgressHUD.m in Sources */,
 				2A7C1A691B58F43000AEC5DA /* AFURLConnectionOperation.m in Sources */,
 				2A759AC51B5FA4600028E891 /* SBJsonParser.m in Sources */,
 				2A759A8E1B5F7A920028E891 /* ShopAdapter.java in Sources */,
@@ -1820,10 +1908,12 @@
 				2A759AC71B5FA4600028E891 /* SBJsonStreamParserAccumulator.m in Sources */,
 				2A00882E1B5E1CD3005DAA3E /* LifeListTableViewCell0.m in Sources */,
 				2A7C1A661B58F43000AEC5DA /* AFHTTPSessionManager.m in Sources */,
+				297E1F561B6DCE2700E074C7 /* LoginViewController.m in Sources */,
 				2A7C1A6A1B58F43000AEC5DA /* AFURLRequestSerialization.m in Sources */,
 				2A7C1A6F1B58F43000AEC5DA /* MessageInterceptor.m in Sources */,
 				2A759ACF1B5FA4600028E891 /* SBJsonWriter.m in Sources */,
 				2A759AA31B5F877B0028E891 /* BaseViewController.m in Sources */,
+				297E1F6E1B6E69E700E074C7 /* MBProgressHUD.m in Sources */,
 				2A7C19D81B58E0EA00AEC5DA /* main.m in Sources */,
 				298301881B691F9E00F77335 /* YRLifeInfoCell.m in Sources */,
 				29E059481B634366006BB61D /* YRTenementInfoCell.m in Sources */,
@@ -1832,6 +1922,7 @@
 				2A7599BA1B5F7A920028E891 /* Business_InfoActivity.java in Sources */,
 				2A7C1A241B58E75200AEC5DA /* MyPropertyViewController.m in Sources */,
 				2A0088331B5E2714005DAA3E /* StoreInfoViewController.m in Sources */,
+				298524051B6A82C200F07C5D /* YRPersonCenterHeaderCell.m in Sources */,
 				2A759AA41B5F877B0028E891 /* TitleView.m in Sources */,
 				29E059121B633786006BB61D /* UIView+CustomView.m in Sources */,
 				2A7C1A651B58F43000AEC5DA /* AFHTTPRequestOperationManager.m in Sources */,
@@ -1841,6 +1932,7 @@
 				2A759ACC1B5FA4600028E891 /* SBJsonStreamWriterState.m in Sources */,
 				2A6669BF1B5CD7E0007A1354 /* LifeListViewController.m in Sources */,
 				2A759AC41B5FA4600028E891 /* NSObject+SBJson.m in Sources */,
+				297E1F671B6E647700E074C7 /* YRUserObject.m in Sources */,
 				2A7C1A7D1B58F43000AEC5DA /* UIImageView+AFNetworking.m in Sources */,
 				4CEE34D21B5B906200B26121 /* RDVTabBarController.m in Sources */,
 				2A7C1A681B58F43000AEC5DA /* AFSecurityPolicy.m in Sources */,

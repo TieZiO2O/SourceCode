@@ -39,7 +39,7 @@
     AFManager *manager = [AFManager manager];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
     
-    [manager POST:[AFManager getUrlStrWithPath:kgetInit] parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+    [manager POST:[AFManager getUrlStrWithPath:KRegisterInterface] parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         MyLog(@"%@",operation.response);
         MyLog(@"responseObject %@",responseObject);
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {

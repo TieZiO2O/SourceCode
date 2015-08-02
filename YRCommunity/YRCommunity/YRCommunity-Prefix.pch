@@ -35,9 +35,9 @@
 
 
 
-#define YRan_URL @"http://211.99.254.114/QMBJoinApp"
+#define YRan_URL @"http://122.114.55.226:8080"
 
-#define kgetInit @"/init/getInit"
+#define KRegisterInterface @"/Community/member/member_regist.do"
 
 
 #endif
