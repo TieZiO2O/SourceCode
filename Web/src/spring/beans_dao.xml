@@ -12,7 +12,6 @@
     <bean id="dbService" abstract="true">
         <property name="dbServiceImpl" ref="databaseServiceImpl" />
     </bean>
-    
 	<bean id="usersDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.UsersDaoImpl" /> 
 	<bean id="cityDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.CityDaoImpl" />
 	<bean id="communityDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.CommunityDaoImpl" /> 
@@ -20,9 +19,15 @@
 	<bean id="propertyDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.PropertyDaoImpl" /> 
 	<bean id="replyDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.ReplyDaoImpl" /> 
 	<bean id="dailyAbcDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.DailyAbcDaoImpl" /> 
+	<bean id="dailyLivesDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.DailyLivesDaoImpl">
+		<property name="webUrl" value="http://122.114.55.226:8080/Community"/>
+	</bean>
 	<bean id="advertisementDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.AdvertisementDaoImpl" />
 	<bean id="happyMomentDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.HappyMomentDaoImpl" />  
 	<bean id="forumThreadDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.ForumThreadDaoImpl">
-		<property name="webUrl" value="http://localhost:8080/Community"/>
+		<property name="webUrl" value="http://122.114.55.226:8080/Community"/>
+	</bean>
+	<bean id="integralDaoImpl" parent="dbService" class="com.nciae.community.dao.impl.IntegralDaoImpl">
+		<property name="webUrl" value="http://122.114.55.226:8080/Community"/>
 	</bean>
 </beans>         

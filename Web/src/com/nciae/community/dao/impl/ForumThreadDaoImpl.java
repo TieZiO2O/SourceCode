@@ -130,6 +130,61 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 		return fts;
 	}
 
+	public ArrayList<ForumThreads> queryAll() {
+		// TODO Auto-generated method stub
+		String sql="SELECT ft.id,ft.guid,ft.title,ft.content,ft.phone,ft.createDate,"
+				+ "fti.imgpath from forumthreads ft "
+				+ "LEFT join forumtheads_img fti on ft.guid=fti.forumthreadsguid "
+				+"GROUP BY ft.guid ORDER BY ft.id";
+				
+				/*"SELECT ft.id,ft.guid,"
+				+ "ft.title,ft.content,ft.createDate,ft.phone from "
+				+ "users_forumthreads uf inner join "
+				+ "forumthreads ft on uf.forumThreadsGuid=ft.guid";*/
+		
+		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		ArrayList<ForumThreads> fts=null;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			rs=ps.executeQuery();
+		
+			fts=new ArrayList<ForumThreads>();
+			while(rs.next()){
+				ForumThreads ft=new ForumThreads();
+				ArrayList<String> strs=new ArrayList<String>();
+				strs.add(this.webUrl+rs.getString("imgpath"));
+				
+				ft.setImages(strs);
+				ft.setId(rs.getInt("id"));
+				ft.setGuid(rs.getString("guid"));
+				ft.setPhone(rs.getString("phone"));
+				ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+				String content=rs.getString("content");
+				ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
+				fts.add(ft);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			fts=null;
+		}finally{
+			if(ps!=null){
+				try {
+					ps.close();
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return fts;
+	}
+
+	
 	@Override
 	public boolean addNewForumThread(ForumThreads forumThread) throws Exception {
 		// TODO Auto-generated method stub

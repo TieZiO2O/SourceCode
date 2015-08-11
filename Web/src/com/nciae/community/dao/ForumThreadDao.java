@@ -11,4 +11,5 @@ public interface ForumThreadDao {
 	public boolean addNewForumThread(ForumThreads forumThread) throws Exception;
 	public boolean addForumImgs(ArrayList<String> imgPaths,String guid) throws Exception;
 	public boolean addNewUser_ForumThread(ForumThreads forumThread) throws Exception;
+	public ArrayList<ForumThreads> queryAll();
 }

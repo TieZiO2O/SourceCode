@@ -27,6 +27,10 @@
  	<bean id="propertyController" class="com.nciae.community.controller.PropertyController">
  	    <property name="propertyDaoImpl" ref="propertyDaoImpl" />
  	</bean>
+ 	<bean id="integralController" class="com.nciae.community.controller.IntegralController">
+ 	    <property name="integralDaoImpl" ref="integralDaoImpl" />
+ 	    <property name="integralCom" ref="integralCom"></property>
+ 	</bean>
  	<bean id="adminUserController" class="com.nciae.community.controller.AdminUserController">
  	    <property name="usersDaoImpl" ref="usersDaoImpl" />
  	    <property name="cityDaoImpl" ref="cityDaoImpl" />
@@ -47,11 +51,18 @@
  	<bean id="forumThreadController" class="com.nciae.community.controller.ForumThreadController">
  		<property name="forumThreadDaoImpl" ref="forumThreadDaoImpl"></property>
  	</bean>
+ 	<bean id="dailyLivesController" class="com.nciae.community.controller.DailyLivesController">
+ 		<property name="dailyLivesDaoImpl" ref="dailyLivesDaoImpl"></property>
+ 	</bean>
  	<bean id="dailyAbcTimerTask" class="com.nciae.community.utils.DailyAbcTimerTask">
 	 	<property name="dailyAbcDaoImpl" ref="dailyAbcDaoImpl" />
 	 </bean>
 	 
 	 <bean id="happyMomentTimerTask" class="com.nciae.community.utils.HappyMomentTimerTask">
 	 	<property name="happyMomentDaoImpl" ref="happyMomentDaoImpl" />
+	 </bean>
+	 
+	 <bean id="integralCom" class="com.nciae.community.common.IntegralCom">
+	 	<property name="integralDaoImpl" ref="integralDaoImpl" />
 	 </bean>
 </beans>         

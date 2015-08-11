@@ -38,6 +38,9 @@ import com.nciae.community.dao.impl.ForumThreadDaoImpl;
 import com.nciae.community.domain.ForumThreads;
 import com.nciae.community.utils.JsonUtil;
 
+/*
+ * 帖子功能
+ * */
 @Controller
 @RequestMapping("/forumThreads")
 public class ForumThreadController {
@@ -133,14 +136,16 @@ public class ForumThreadController {
 	public ArrayList<String> saveAllImgs(HttpServletRequest request,String guid){
 		CommonsMultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
 		ArrayList<String> imgs=null;
+		imgs=new ArrayList<String>();
 		//判断是否有多文件上传
 		if(resolver.isMultipart(request)){
 			MultipartHttpServletRequest mutiRequest=(MultipartHttpServletRequest)request;
 			HttpSession session=request.getSession();
+			
+			int index=0;
+			
 			Iterator<String> iter=mutiRequest.getFileNames();
 			
-			imgs=new ArrayList<String>();
-			int index=0;
 			while(iter.hasNext()){
 				
 				//System.out.println("=====图片路径："+iter.next()+"=======");
@@ -188,7 +193,7 @@ public class ForumThreadController {
 		return imgs;
 	}
 
-	@RequestMapping(value="getOneByGuid")
+	@RequestMapping(value="getOneByGuid",method=RequestMethod.POST)
 	public void getOne(String guid,HttpServletResponse response,PrintWriter pw){
 		
 		JSONObject json=new JSONObject();
@@ -210,7 +215,7 @@ public class ForumThreadController {
 	}
 	
 	@RequestMapping("getAllByUid")
-	public void getAll(String uid,HttpServletResponse response,PrintWriter pw){
+	public void getAllByUid(String uid,HttpServletResponse response,PrintWriter pw){
 		JSONObject json=new JSONObject();
 		ArrayList<ForumThreads> fts=null;
 
@@ -232,6 +237,24 @@ public class ForumThreadController {
 		System.out.println(fts.get(0).getContent());
 		return;
 	}
+	
+	@RequestMapping("getAll")
+	public void getAll(HttpServletResponse response,PrintWriter pw){
+		JSONObject json=new JSONObject();
+		ArrayList<ForumThreads> fts=null;
+
+		response.setCharacterEncoding("utf-8");
+		response.setContentType("text/html;charset:utf-8");
+		
+		fts=this.forumThreadDaoImpl.queryAll();
+		
+		json.put("result", "success");
+		json.put("info", fts);
+		pw.write(json.toString());
+		System.out.println(fts.get(0).getContent());
+		return;
+	}
+
 	public ForumThreadDaoImpl getForumThreadDaoImpl() {
 		return forumThreadDaoImpl;
 	}

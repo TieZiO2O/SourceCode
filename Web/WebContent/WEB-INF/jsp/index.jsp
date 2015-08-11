@@ -151,11 +151,14 @@
 				</tr>
 			</table>
 		</form>
-		<form action="forumThreads/list.do" method="POST">
+		<form action="dailyLives/getAllDailyType.do" method="POST">
 			<input type="submit" value="添加"/>
 		</form>
 		<form action="forumThreads/query.do" method="POST">
 			<input type="submit" value="提交"/>
+		</form>
+		<form action="integral/jumpToFraciton.do" method="POST">
+			<input type="submit" value="到积分"/>
 		</form>
 	</center>
 </body>
