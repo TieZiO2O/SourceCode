@@ -376,7 +376,7 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 				dl.setId(rs.getInt("id"));
 				dl.setServiceType(rs.getString("serviceType"));
 				dl.setStyle(rs.getString("style"));
-				dl.setLogoPath(rs.getString("logoPath"));
+				dl.setLogoPath(this.webUrl+rs.getString("logoPath"));
 				dailyTypes.add(dl);
 			}
 		} catch (Exception e) {
@@ -426,7 +426,7 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 				dl.setId(rs.getInt("id"));
 				dl.setServiceType(rs.getString("serviceType"));
 				dl.setStyle(rs.getString("style"));
-				dl.setLogoPath(rs.getString("logoPath"));
+				dl.setLogoPath(this.webUrl+rs.getString("logoPath"));
 				if(dl.getServiceType().equals("全城服务")){
 					allCityTyps.add(dl);
 				}else{
