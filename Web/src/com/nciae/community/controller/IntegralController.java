@@ -1,0 +1,246 @@
+package com.nciae.community.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.beanutils.converters.StringConverter;
+import org.apache.commons.codec.binary.StringUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+import com.nciae.community.common.IntegralCom;
+import com.nciae.community.dao.impl.IntegralDaoImpl;
+import com.nciae.community.domain.DailyLives;
+import com.nciae.community.domain.DailyLivesType;
+import com.nciae.community.domain.Integral;
+import com.nciae.community.domain.IntegralCommodity;
+
+/*
+ * 积分功能
+ * */
+@Controller
+@RequestMapping("integral")
+public class IntegralController {
+	
+	private IntegralDaoImpl integralDaoImpl;
+	public IntegralDaoImpl getIntegralDaoImpl() {
+		return integralDaoImpl;
+	}
+	public void setIntegralDaoImpl(IntegralDaoImpl integralDaoImpl) {
+		this.integralDaoImpl = integralDaoImpl;
+	}
+	
+	private IntegralCom integralCom;
+	/*
+	 *更新积分
+	 *Integral中的addOrFract=true，代表添加积分，false代表减去积分 
+	 * */
+	@RequestMapping("modify")
+	public String CalcIntegral(Integral integral,PrintWriter pw){
+		Integral inte=this.integralDaoImpl.QueryIntegral(Integer.toString(integral.getUserId()));
+		boolean result=true;
+		JSONObject json=new JSONObject();
+		
+		if(inte==null){
+			result=this.integralDaoImpl.InsertIntegral(integral);
+		}else{
+			if(integral.isAddOrFract()){
+				result=this.integralDaoImpl.AddIntegral(integral);
+			}else{
+				result=this.integralDaoImpl.SubtractIntegral(integral);
+			}
+		}
+		
+		if(!result){
+			json.put("result", "failed");
+			json.put("info", "操作失败，请重新操作");
+		}else{
+			json.put("result", "success");
+			json.put("info", "操作成功");
+		}
+		
+		pw.write(json.toString());
+		
+		return "integral/modify";
+	}
+	
+	@RequestMapping("getByUid")
+	public void GetIntegralByUid(HttpServletRequest request,String uid,PrintWriter pw){
+		JSONObject json=new JSONObject();
+		if(uid==""){
+			json.put("result", "failed");
+			json.put("info", "用户的Id不能为空");
+			pw.write(json.toString());
+			//return "integral/getOne";
+			return;
+		}
+			
+		Integral integral=this.integralDaoImpl.QueryIntegral(uid);
+		
+		request.setAttribute("integral", integral);
+		json.put("result", "success");
+		json.put("info", integral);
+		pw.write(json.toString());
+		return;
+		//return "integral/getOne";
+	}
+
+	@RequestMapping("modifyoperate")
+	public String ModifyOperate(HttpServletRequest request,PrintWriter pw){
+		
+		String otype=request.getParameter("operateType");
+		JSONObject json=new JSONObject();
+		if(otype.equals("")){
+			json.put("result", "fail");
+			json.put("info", "增加积分出错，请选择操作的类型");
+			pw.write(json.toString());
+			return "integral/modifyoperate";
+		}
+		request.getParameter("fraction");
+		request.getParameter("addOrdecrease");
+		return "integral/modifyoperate";
+	}
+	
+	@RequestMapping("modify_fraction")
+	public void ModifyFraction(HttpServletRequest request,PrintWriter pw){
+		
+		this.integralCom.OperateUserIntegral(request, pw);		
+		return;
+	}
+	
+	@RequestMapping("jumpToFraciton")
+	public String JumpToFraciton(){
+		return "integral/modify_fraction";
+	}
+	
+	@RequestMapping(value="getallcommodity",method=RequestMethod.POST)
+	public void GetAllCommodity(HttpServletRequest request,HttpServletResponse response,PrintWriter pw){
+		JSONObject json=new JSONObject();
+		ArrayList<IntegralCommodity> dls=this.integralDaoImpl.queryAllByCommodity();
+		
+		json.put("result", "success");
+		json.put("info",dls);
+		pw.write(json.toString());
+		
+		//return "integral/getallcommodity";
+		return;
+	}
+
+	@RequestMapping("getcomdetail")
+	public void GetOneServiceTypeByGid(HttpServletRequest request,PrintWriter pw){
+		String guid=request.getParameter("guid");
+		JSONObject json=new JSONObject();
+		if (guid=="") {
+			json.put("result", "fail");
+			json.put("info", "查询服务的guid不能为空");
+			pw.write(json.toString());
+			return;
+			//return "integral/getcomdetail";
+		}
+		
+		IntegralCommodity dl=this.integralDaoImpl.queryByGuid(guid);
+		
+		if(dl==null){
+			json.put("result", "fail");
+			json.put("info", "查询失败");
+			pw.write(json.toString());
+			return;
+			//return "integral/getcomdetail";
+		}
+		
+		json.put("result", "success");
+		json.put("info", dl);
+		pw.write(json.toString());
+		
+		return;
+		//return "integral/getcomdetail";
+	}
+	
+	@RequestMapping("addservicetype")
+	/*public String AddServiceType(HttpServletRequest request,PrintWriter pw){
+		DailyLivesType dlv=new DailyLivesType();
+		JSONObject json=new JSONObject();
+		if(request.getParameter("style").equals("")){
+			json.put("result", "fail");
+			json.put("info", "要添加的服务类型不能为空，请重新操作");
+			return "dailyLives/addservicetype";
+		}
+		
+		CommonsMultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
+		if(resolver.isMultipart(request)){
+			MultipartHttpServletRequest mutireqeust=(MultipartHttpServletRequest)request;
+			Iterator<String> fileNames=mutireqeust.getFileNames();
+			while(fileNames.hasNext()){
+				String fileOldName=fileNames.next();
+				MultipartFile file=mutireqeust.getFile(fileOldName);
+				
+				String fileOldPath=file.getOriginalFilename();
+				//设置文件的保存地址
+				String path="/img/serviceTypeLogo/"+request.getParameter("style")+"/";
+				String fileRealPath=mutireqeust.getSession().getServletContext().getRealPath(path);
+				File saveFile=new File(fileRealPath);
+				
+				if(!saveFile.exists()){
+					saveFile.mkdirs();
+				}
+				//获取文件后缀名
+				String extension=fileOldPath.substring(fileOldPath.indexOf(".")+1,fileOldPath.length()).toLowerCase();
+				//获取文件名
+				String fileName=fileOldPath.substring(0,fileOldPath.indexOf("."));
+				SimpleDateFormat date=new SimpleDateFormat("yyyyMMddHHmmss");
+				
+				String fileNewName=date.format(new Date())+"."+extension;
+				fileRealPath=fileRealPath+File.separator+fileNewName;
+				
+				File newFile=new File(fileRealPath);
+				try {
+					file.transferTo(newFile);
+				} catch (IllegalStateException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				dlv.setLogoPath(path+"/"+fileNewName);
+			}
+		}else{
+			dlv.setLogoPath("");
+		}
+		
+		dlv.setStyle(request.getParameter("style"));
+		dlv.setServiceType(request.getParameter("servicetype"));
+		
+		boolean result=this.dailyLivesDaoImpl.addNewDailyLivesType(dlv);
+		if(result){
+			json.put("result", "success");
+			json.put("info", "添加成功");
+		}else{
+			json.put("result", "fail");
+			json.put("info", "添加失败");
+		}
+		pw.write(json.toString());
+		return "dailyLives/addservicetype";
+	}
+	*/
+	
+	
+	public IntegralCom getIntegralCom() {
+		return integralCom;
+	}
+	public void setIntegralCom(IntegralCom integralCom) {
+		this.integralCom = integralCom;
+	}
+}
