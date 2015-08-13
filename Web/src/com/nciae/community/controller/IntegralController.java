@@ -45,12 +45,83 @@ public class IntegralController {
 	}
 	
 	private IntegralCom integralCom;
+	
 	/*
 	 *更新积分
 	 *Integral中的addOrFract=true，代表添加积分，false代表减去积分 
 	 * */
 	@RequestMapping("modify")
-	public String CalcIntegral(Integral integral,PrintWriter pw){
+	public void CalcIntegral(HttpServletRequest request,PrintWriter pw){
+		String userName=request.getParameter("name");
+		ArrayList<Integral> inte=this.integralDaoImpl.QueryIntegral_By_UserName(userName);
+		boolean result=true;
+		JSONObject json=new JSONObject();
+		
+		Integral integral=new Integral();
+		integral.setUserName(userName);
+		String fract=request.getParameter("fraction");
+		integral.setFraction(Integer.parseInt(fract));
+		
+		String isAdd=request.getParameter("addOrFract");
+		boolean IsAdd=true;
+		if(isAdd.equals("true")){
+			IsAdd=true;
+		}else{
+			IsAdd=false;
+		}
+		integral.setAddOrFract(IsAdd);
+		
+		if(inte.equals(null)){
+			result=this.integralDaoImpl.InsertIntegral(integral);
+		}else{
+			if(integral.isAddOrFract()){
+				result=this.integralDaoImpl.AddIntegral(integral);
+			}else{
+				result=this.integralDaoImpl.SubtractIntegral(integral);
+			}
+		}
+		
+		if(!result){
+			json.put("result", "failed");
+			json.put("info", "操作失败，请重新操作");
+		}else{
+			json.put("result", "success");
+			json.put("info", "操作成功");
+		}
+		
+		pw.write(json.toString());
+		
+		return;
+	}
+	
+	@RequestMapping("query")
+	public String queryByUserName(HttpServletRequest request,PrintWriter pw){
+		
+		JSONObject json=new JSONObject();
+		String uName=request.getParameter("name");
+		if(uName.equals("")){
+			json.put("result", "failed");
+			json.put("info", "用户名不能为空");
+			pw.write(json.toString());
+			return "integral/query";
+			//return "integral/getOne";
+		}
+			
+		ArrayList<Integral> integrals=this.integralDaoImpl.QueryIntegral_By_UserName(uName);
+		
+		request.setAttribute("integrals", integrals);
+		json.put("result", "success");
+		json.put("info", integrals);
+		pw.write(json.toString());
+		
+		return "integral/query";
+	}
+	
+	@RequestMapping("integral_page")
+	public String integral_Page(){
+		return "integral/query";
+	}
+	/*public String CalcIntegral(Integral integral,PrintWriter pw){
 		Integral inte=this.integralDaoImpl.QueryIntegral(Integer.toString(integral.getUserId()));
 		boolean result=true;
 		JSONObject json=new JSONObject();
@@ -77,7 +148,7 @@ public class IntegralController {
 		
 		return "integral/modify";
 	}
-	
+	*/
 	@RequestMapping("getByUid")
 	public void GetIntegralByUid(HttpServletRequest request,String uid,PrintWriter pw){
 		JSONObject json=new JSONObject();
@@ -170,8 +241,8 @@ public class IntegralController {
 		//return "integral/getcomdetail";
 	}
 	
-	@RequestMapping("addservicetype")
-	/*public String AddServiceType(HttpServletRequest request,PrintWriter pw){
+	/*@RequestMapping("addservicetype")
+	public String AddServiceType(HttpServletRequest request,PrintWriter pw){
 		DailyLivesType dlv=new DailyLivesType();
 		JSONObject json=new JSONObject();
 		if(request.getParameter("style").equals("")){

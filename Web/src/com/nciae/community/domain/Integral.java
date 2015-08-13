@@ -28,12 +28,13 @@ public class Integral {
 	 * false,代表减分数
 	 * */
 	private boolean addOrFract;
+	private String userName;
 	
 	@Override
 	public String toString() {
 		return "Integral [id=" + id + ", fraction=" + fraction + ", userId="
 				+ userId + ", isUsed=" + isUsed + ", addOrFract=" + addOrFract
-				+ "]";
+				+ ", userName=" + userName + "]";
 	}
 	public boolean isAddOrFract() {
 		return addOrFract;
@@ -64,6 +65,12 @@ public class Integral {
 	}
 	public void setUsed(boolean isUsed) {
 		this.isUsed = isUsed;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	
 }

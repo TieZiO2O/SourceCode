@@ -11,14 +11,18 @@
 <script type="text/javascript">
 	$(document).ready(function(){
 		$("#belong").change(function(){
-			$("#type").val($(this).val());
+			var data=$(this).val();
+			alert(data);
+			$("#type").val(data);
 		})
+		
+		$("#type").val($("#belong").val());
 	})
 </script>
 <title>添加新服务类型</title>
 </head>
 <body>
-	<form action="addservicetype.do">
+	<form action="addservicetype.do" method="post" enctype="multipart/form-data">
 		<table>
 			<tr>
 				<td>服务类型：</td>
@@ -37,11 +41,13 @@
 			<tr>
 				<td>服务Logo：</td>
 				<td>
-					<input type="file" name="img"> 
+					<input type="file" name="image"/>
 				</td>
 			</tr>
 			
 		</table>
+		<br>
+		<input type="submit" value="提交">
 	</form>
 </body>
 </html>

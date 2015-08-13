@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -100,17 +101,14 @@ public class DailyLivesController {
 		if(resolver.isMultipart(request)){
 			MultipartHttpServletRequest mutiRequest=(MultipartHttpServletRequest)request;
 			HttpSession session=request.getSession();
-			
-			Iterator<String> fileNames=mutiRequest.getFileNames();
+			Iterator<MultipartFile> mutiFiles=mutiRequest.getFiles("img").iterator();
 			
 			int index=0;
 			imgs=new ArrayList<String>();
 			
-			while(fileNames.hasNext()){
-				//System.out.println("=====图片路径："+iter.next()+"=======");
+			while(mutiFiles.hasNext()){
 				index++;
-				//获取当前文件
-				MultipartFile file=mutiRequest.getFile(fileNames.next());
+				MultipartFile file=mutiFiles.next();
 				//获取远程文件的地址
 				String fileOldPath=file.getOriginalFilename();
 				
@@ -146,7 +144,7 @@ public class DailyLivesController {
 				imgs.add(path+"/"+fileNewName);
 			}
 		}
-		
+			
 		return imgs;
 	}
 	
@@ -242,13 +240,15 @@ public class DailyLivesController {
 	public String AddServiceType(HttpServletRequest request,PrintWriter pw){
 		DailyLivesType dlv=new DailyLivesType();
 		JSONObject json=new JSONObject();
-		if(request.getParameter("style").equals("")){
+		String style=request.getParameter("style");
+		if(style.equals("")){
 			json.put("result", "fail");
 			json.put("info", "要添加的服务类型不能为空，请重新操作");
 			return "dailyLives/addservicetype";
 		}
 		
 		CommonsMultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
+		
 		if(resolver.isMultipart(request)){
 			MultipartHttpServletRequest mutireqeust=(MultipartHttpServletRequest)request;
 			Iterator<String> fileNames=mutireqeust.getFileNames();
@@ -258,7 +258,7 @@ public class DailyLivesController {
 				
 				String fileOldPath=file.getOriginalFilename();
 				//设置文件的保存地址
-				String path="/img/serviceTypeLogo/"+request.getParameter("style")+"/";
+				String path="/img/serviceLogo/";
 				String fileRealPath=mutireqeust.getSession().getServletContext().getRealPath(path);
 				File saveFile=new File(fileRealPath);
 				
@@ -288,8 +288,9 @@ public class DailyLivesController {
 			dlv.setLogoPath("");
 		}
 		
-		dlv.setStyle(request.getParameter("style"));
-		dlv.setServiceType(request.getParameter("servicetype"));
+		String serviceType=request.getParameter("servicetype");
+		dlv.setStyle(style);
+		dlv.setServiceType(serviceType);
 		
 		boolean result=this.dailyLivesDaoImpl.addNewDailyLivesType(dlv);
 		if(result){

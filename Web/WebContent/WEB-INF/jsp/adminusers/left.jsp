@@ -34,8 +34,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       	 <li><a href="${pageContext.request.contextPath}/adminusers/community_page.do" target="right">小区管理</a></li>
       	 <li><a href="${pageContext.request.contextPath}/adminusers/shopper_page.do" target="right">商户管理</a></li>
       	 <li><a href="${pageContext.request.contextPath}/adminusers/property_page.do" target="right">物业管理</a></li>
-      	 <li><a href="${pageContext.request.contextPath}/integral/modify.do" target="right">积分管理</a></li>
-      	 <li><a href="${pageContext.request.contextPath}/integral/getByUid.do" target="right">查询积分</a></li>
+      	 <li><a href="${pageContext.request.contextPath}/integral/integral_page.do" target="right">积分管理</a></li>
+      	 <%-- <li><a href="${pageContext.request.contextPath}/integral/getByUid.do" target="right">查询积分</a></li> --%>
       	 <li><a href="${pageContext.request.contextPath}/dailyLives/servicemanage.do" target="right">服务管理</a></li>
       	 <%-- <li><a href="${pageContext.request.contextPath}/adminusers/upload_page.do" target="right">上传图片</a></li> --%>
       	 <%-- <li><a href="${pageContext.request.contextPath}/user/admin_logout.do" target="right">注销</a></li>

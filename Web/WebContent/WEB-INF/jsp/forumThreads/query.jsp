@@ -7,9 +7,15 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<form action="getOneByGuid.do" method="POST">
+	<form action="isthreadbelong.do" method="POST">
 		<input type="text" value="94c9dfd6-258d-4805-8e97-c65db418fdeb" name="guid">
+		<input type="text" value="1" name="uid">
 		<input type="submit" value="查一个">
+	</form>
+	
+	<form action="deletebyguid.do" method="POST">
+		<input type="text" value="94c9dfd6-258d-4805-8e97-c65db418fdeb" name="guid">
+		<input type="submit" value="删除">
 	</form>
 	
 	<form action="getAllByUid.do" method="POST">

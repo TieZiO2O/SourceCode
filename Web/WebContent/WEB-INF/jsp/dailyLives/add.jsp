@@ -87,12 +87,12 @@
 			</tr>
 			<tr>
 				<td>店面地址：</td>
-				<td><input type="text" name="customerNotice"></td>
+				<td><input type="text" name="address"></td>
 				<td>联系方式:</td>
 				<td><input type="text" name="phone"></td>
 			</tr>
 			<tr>
-				<td>题目：</td>
+				<td>题　　目：</td>
 				<td colspan="3"><input type="text" name="title"/></td>
 			</tr>
 			<tr>
@@ -100,7 +100,7 @@
 				<td colspan="3"><textarea rows="3" cols="60" name="customerNotice"></textarea></td>
 			</tr>
 			<tr>
-				<td>内容：</td>
+				<td>内　　容：</td>
 				<td colspan="3"><textarea rows="10" cols="60" name="content"></textarea></td>
 			</tr>
 		</table>

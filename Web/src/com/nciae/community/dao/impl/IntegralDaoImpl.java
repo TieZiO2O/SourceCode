@@ -40,12 +40,12 @@ public class IntegralDaoImpl implements IntegralDao {
 		// TODO Auto-generated method stub
 		boolean returnData=true;
 		
-		String sql="update Integral set fraction=fraction+? where userId=?";
+		String sql="update Integral set fraction=fraction+? where userName=?";
 		PreparedStatement ps=null;
 		try {
 			ps=dbServiceImpl.connect().prepareStatement(sql);
 			ps.setInt(1, integral.getFraction());
-			ps.setInt(2, integral.getUserId());
+			ps.setString(2, integral.getUserName());
 			
 			int result=ps.executeUpdate();
 			
@@ -83,12 +83,12 @@ public class IntegralDaoImpl implements IntegralDao {
 		// TODO Auto-generated method stub
 		
 		boolean returnData=true;
-		String sql="update Integral set fraction=fraction-? where userId=?";
+		String sql="update Integral set fraction=fraction-? where userName=?";
 		PreparedStatement ps=null;
 		try {
 			ps=dbServiceImpl.connect().prepareStatement(sql);
 			ps.setInt(1, integral.getFraction());
-			ps.setInt(2, integral.getUserId());
+			ps.setString(2, integral.getUserName());
 			
 			int result=ps.executeUpdate();
 			
@@ -135,8 +135,56 @@ public class IntegralDaoImpl implements IntegralDao {
 					returnData=new Integral();
 					returnData.setId(result.getInt("id"));
 					returnData.setFraction(result.getInt("fraction"));
+					returnData.setUserName(result.getString("userName"));
 					returnData.setUserId(result.getInt("userId"));
 					returnData.setUsed(result.getBoolean("isUsed"));
+				}
+			}
+		} catch (Exception e) {
+			returnData=null;
+			// TODO: handle exception
+		}finally{
+			try {
+				dbServiceImpl.close();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if(ps!=null){
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return returnData;
+		
+	}
+
+	public ArrayList<Integral> QueryIntegral_By_UserName(String userName){
+		ArrayList<Integral> returnData=null;
+		String sql="select * from integral where userName=?";
+				//"select * from users u RIGHT JOIN integral i on u.id=i.userId where u.userName=?";
+		PreparedStatement ps=null;
+		try {
+			ps=dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(1, userName);
+			ResultSet result=ps.executeQuery();
+			
+			if (result!=null) {
+				returnData=new ArrayList<Integral>();
+				while(result.next()){
+					Integral integral=new Integral();
+					integral=new Integral();
+					integral.setId(result.getInt("id"));
+					integral.setFraction(result.getInt("fraction"));
+					integral.setUserName(result.getString("userName"));
+					integral.setUserId(result.getInt("userId"));
+					integral.setUsed(result.getBoolean("isUsed"));
+					returnData.add(integral);
 				}
 			}
 		} catch (Exception e) {
@@ -166,13 +214,13 @@ public class IntegralDaoImpl implements IntegralDao {
 	@Override
 	public boolean InsertIntegral(Integral integral){
 		boolean returnData=true;
-		String sql="insert into Integral(userId,fraction,isUsed) values(?,?,?)";
+		String sql="INSERT into integral(userId,isUsed,fraction,userName)"
+				+ " SELECT u.id,1,?,u.userName from users u where u.userName=? group BY u.id limit 1";
 		PreparedStatement ps=null;
 		try {
 			ps=dbServiceImpl.connect().prepareStatement(sql);
-			ps.setInt(2, integral.getFraction());
-			ps.setInt(1, integral.getUserId());
-			ps.setBoolean(3, true);
+			ps.setInt(1, integral.getFraction());
+			ps.setString(2, integral.getUserName());
 			
 			int result=ps.executeUpdate();
 			
@@ -267,7 +315,7 @@ public class IntegralDaoImpl implements IntegralDao {
 				ft.setId(rs.getInt("id"));
 				ft.setGuid(rs.getString("guid"));
 				ft.setPhone(rs.getString("phone"));
-				ft.setImg(rs.getString("img_path"));
+				ft.setImg(this.webUrl+rs.getString("img_path"));
 				ft.setFraction(rs.getInt("fraction"));
 				ft.setLimitAmount(rs.getInt("limitAmount"));
 				ft.setStartTime(rs.getString("startTime"));

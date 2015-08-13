@@ -3,6 +3,7 @@ package com.nciae.community.controller;
 import java.beans.Encoder;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -137,17 +138,63 @@ public class ForumThreadController {
 		CommonsMultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
 		ArrayList<String> imgs=null;
 		imgs=new ArrayList<String>();
+
 		//判断是否有多文件上传
 		if(resolver.isMultipart(request)){
 			MultipartHttpServletRequest mutiRequest=(MultipartHttpServletRequest)request;
 			HttpSession session=request.getSession();
-			
 			int index=0;
-			
 			Iterator<String> iter=mutiRequest.getFileNames();
 			
-			while(iter.hasNext()){
+			
+			Iterator<MultipartFile> mutiFiles=mutiRequest.getFiles(iter.next()).iterator();
+			while(mutiFiles.hasNext()){
 				
+				//System.out.println("=====图片路径："+iter.next()+"=======");
+				index++;
+				//获取当前文件
+				MultipartFile file=mutiFiles.next();
+				//获取远程文件的地址
+				String fileOldPath=file.getOriginalFilename();
+				
+				//获取用户Id
+				String id=request.getParameter("uid");
+				//设置文件保存地址
+				String path="/img/forumThreadsImg";
+				path=path+"/"+id+"/"+guid;
+				
+				//获取文件保存地址
+				String fileRealPath=mutiRequest.getSession().getServletContext().getRealPath(path);
+				File saveFile=new File(fileRealPath);
+				if(!saveFile.exists()){
+					saveFile.mkdirs();
+				}
+				
+				//获取文件后缀名
+				String extension=fileOldPath.substring(fileOldPath.indexOf(".")+1,fileOldPath.length()).toLowerCase();
+				//获取文件名
+				String fileName=fileOldPath.substring(0,fileOldPath.indexOf("."));
+				
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
+				//新文件全名
+				String fileNewName=sdf.format(new Date())+"_"+index+"."+extension;
+				//新文件url
+				String fileUrl=fileRealPath+File.separator+fileNewName;
+				
+				//保存文件
+				File localFile=new File(fileUrl);
+				try {
+					file.transferTo(localFile);
+				} catch (IllegalStateException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				imgs.add(path+"/"+fileNewName);
+			}
+			
+			
+			/*while(iter.hasNext()){
+			
 				//System.out.println("=====图片路径："+iter.next()+"=======");
 				index++;
 				//获取当前文件
@@ -188,7 +235,7 @@ public class ForumThreadController {
 					e.printStackTrace();
 				}
 				imgs.add(path+"/"+fileNewName);
-			}
+			}*/
 		}
 		return imgs;
 	}
@@ -212,6 +259,71 @@ public class ForumThreadController {
 		json.put("info", ft);
 		pw.write(json.toString());
 		return;
+	}
+
+	/**
+	 * 按照uid和guid查询判断该帖子是否从属于该用户
+	 * @param uid,用户的Id
+	 * @param guid,帖子的guid
+	 * @return result, info
+	 * */
+	@RequestMapping("isthreadbelong")
+	public void getOne_By_UidAndGuid(HttpServletRequest request,PrintWriter pw){
+		String uid=request.getParameter("uid");
+		String guid=request.getParameter("guid");
+		JSONObject json=new JSONObject();
+		if(uid.equals("")){
+			json.put("result", "fail");
+			json.put("info", "用户Id不能为空");
+			pw.write(json.toString());
+			return;
+		}
+		
+		if(guid.equals("")){
+			json.put("result", "fail");
+			json.put("info", "要查询的帖子的guid不能为空");
+			pw.write(new String(json.toString()));
+			return;
+		}
+		
+		boolean ft=this.forumThreadDaoImpl.query_IsBelong(uid, guid);
+		if(!ft){
+			json.put("result", "notexist");
+			json.put("info", "该用户不具备对帖子的操作权限");
+			pw.write(json.toString());
+			return;
+		}else{
+			json.put("result", "exist");
+			json.put("info", "该用户具备对帖子的操作权限");
+			pw.write(json.toString());
+			return;
+		}
+	}
+	
+	@RequestMapping("deletebyguid")
+	public void deleteOne_By_Guid(HttpServletRequest request,PrintWriter pw){
+		String guid=request.getParameter("guid");
+		JSONObject json=new JSONObject();
+		
+		if(guid.equals("")){
+			json.put("result", "fail");
+			json.put("info", "要删除的帖子的guid不能为空");
+			pw.write(json.toString());
+			return;
+		}
+		
+		boolean ft=this.forumThreadDaoImpl.delete_By_Guid(guid);
+		if(ft){
+			json.put("result", "success");
+			json.put("info", "该帖子已被删除");
+			pw.write(json.toString());
+			return;
+		}else{
+			json.put("result", "fail");
+			json.put("info", "操作失败，请重新操作");
+			pw.write(json.toString());
+			return;
+		}
 	}
 	
 	@RequestMapping("getAllByUid")

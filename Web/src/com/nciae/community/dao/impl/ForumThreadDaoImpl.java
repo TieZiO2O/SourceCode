@@ -3,6 +3,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,7 +42,7 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 				+ "ft.phone,fti.imgpath"
 				+ " from forumthreads ft "
 				+ "inner join forumtheads_img fti "
-				+ "on ft.guid=fti.forumthreadsguid where ft.guid=?";
+				+ "on ft.guid=fti.forumthreadsguid where ft.guid=? and ft.isUsed=true";
 		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -83,9 +84,45 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 	}
 
 	@Override
+	public boolean query_IsBelong(String uid,String guid) {
+		// TODO Auto-generated method stub
+		String sql="select uf.userId from users_forumthreads uf "
+				+ "INNER JOIN forumthreads f on uf.forumThreadsGuid=f.guid "
+				+ "where f.guid=? and uf.userId=? and f.isUsed=true";
+
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		boolean result=true;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(1, guid);
+			ps.setInt(2, Integer.parseInt(uid));
+			rs=ps.executeQuery();
+			
+			if(!rs.next()){
+				result=false;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}finally{
+			if(ps!=null){
+				try {
+					ps.close();
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
 	public ArrayList<ForumThreads> queryAllByUid(String uid) {
 		// TODO Auto-generated method stub
-		String sql="SELECT ft.id,ft.guid,"
+		String sql="SELECT ft.id,ft.guid,uf.userId,"
 				+ "ft.title,ft.content,ft.createDate,ft.phone from "
 				+ "users_forumthreads uf inner join "
 				+ "forumthreads ft on uf.forumThreadsGuid=ft.guid "
@@ -105,8 +142,10 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 			while(rs.next()){
 				ForumThreads ft=new ForumThreads();
 				ft.setId(rs.getInt("id"));
+				ft.setUid(rs.getString("userId"));
 				ft.setGuid(rs.getString("guid"));
 				ft.setPhone(rs.getString("phone"));
+				ft.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rs.getString("createDate")));
 				ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
 				String content=rs.getString("content");
 				ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
@@ -132,16 +171,11 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 
 	public ArrayList<ForumThreads> queryAll() {
 		// TODO Auto-generated method stub
-		String sql="SELECT ft.id,ft.guid,ft.title,ft.content,ft.phone,ft.createDate,"
-				+ "fti.imgpath from forumthreads ft "
-				+ "LEFT join forumtheads_img fti on ft.guid=fti.forumthreadsguid "
-				+"GROUP BY ft.guid ORDER BY ft.id";
-				
-				/*"SELECT ft.id,ft.guid,"
-				+ "ft.title,ft.content,ft.createDate,ft.phone from "
-				+ "users_forumthreads uf inner join "
-				+ "forumthreads ft on uf.forumThreadsGuid=ft.guid";*/
-		
+		String sql="SELECT ft.id,ut.userId,ft.guid,ft.title,ft.content,ft.phone,ft.createDate,"
+				+" fti.imgpath from users_forumthreads ut LEFT JOIN forumthreads ft on ut.forumThreadsGuid=ft.guid"
+				+" LEFT join forumtheads_img fti on ft.guid=fti.forumthreadsguid where ft.isUsed=true"
+				+" GROUP BY ft.guid ORDER BY ft.id";
+
 		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
 		
 		PreparedStatement ps=null;
@@ -159,8 +193,10 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 				
 				ft.setImages(strs);
 				ft.setId(rs.getInt("id"));
+				ft.setUid(rs.getString("userId"));
 				ft.setGuid(rs.getString("guid"));
 				ft.setPhone(rs.getString("phone"));
+				ft.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rs.getString("createDate")));
 				ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
 				String content=rs.getString("content");
 				ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
@@ -300,5 +336,45 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 		return returnData;
 	}
 
+	@Override
+	public boolean delete_By_Guid(String guid){
+		PreparedStatement ps=null;
+		String sql="update forumthreads set isUsed=false where guid=?";
+		boolean result=true;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(1, guid);
+			int count=ps.executeUpdate();
+			
+			if(count>0){
+				result=true;
+			}else{
+				result=false;
+			}
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			result=false;
+		}finally{
+			if(ps!=null){
+				try {
+					
+					try {
+						this.dbServiceImpl.close();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					ps.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return result;
+	}
 
 }
