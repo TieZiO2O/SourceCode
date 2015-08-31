@@ -14,11 +14,15 @@ public class DailyLives {
 	private String content;
 	private String phone;
 	private Date createDate;
+	//是否在主页面显示
+	private boolean isMainList;
 	private ArrayList<String> images;
 	/*private ArrayList<String> styles;*/
 	private String customerNotice;
 	private String address;
+	private String communitys;
 	private int dailyLivesId;
+	private DailyLivesType dailyLivesType;
 	public ArrayList<String> getImages() {
 		return images;
 	}
@@ -72,9 +76,10 @@ public class DailyLives {
 	public String toString() {
 		return "DailyLives [id=" + id + ", uid=" + uid + ", guid=" + guid
 				+ ", title=" + title + ", content=" + content + ", phone="
-				+ phone + ", createDate=" + createDate + ", images=" + images
-				+ ", customerNotice=" + customerNotice + ", address=" + address
-				+ ", dailyLivesId=" + dailyLivesId + "]";
+				+ phone + ", createDate=" + createDate + ", isMainList="
+				+ isMainList + ", images=" + images + ", customerNotice="
+				+ customerNotice + ", address=" + address + ", dailyLivesId="
+				+ dailyLivesId + ", dailyLivesType=" + dailyLivesType + "]";
 	}
 	public String getCustomerNotice() {
 		return customerNotice;
@@ -93,6 +98,24 @@ public class DailyLives {
 	}
 	public void setDailyLivesId(int dailyLivesId) {
 		this.dailyLivesId = dailyLivesId;
+	}
+	public DailyLivesType getDailyLivesType() {
+		return dailyLivesType;
+	}
+	public void setDailyLivesType(DailyLivesType dailyLivesType) {
+		this.dailyLivesType = dailyLivesType;
+	}
+	public boolean isMainList() {
+		return isMainList;
+	}
+	public void setMainList(boolean isMainList) {
+		this.isMainList = isMainList;
+	}
+	public String getCommunitys() {
+		return communitys;
+	}
+	public void setCommunitys(String communitys) {
+		this.communitys = communitys;
 	}
 
 }

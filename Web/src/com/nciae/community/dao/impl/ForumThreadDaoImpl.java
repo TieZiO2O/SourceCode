@@ -38,10 +38,10 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 	public ForumThreads queryByGuid(String guid) {
 		// TODO Auto-generated method stub
 		String sql="SELECT ft.id,ft.guid,"
-				+ "ft.title,ft.content,"
+				+ "ft.title,ft.content,ft.isUsed,"
 				+ "ft.phone,fti.imgpath"
 				+ " from forumthreads ft "
-				+ "inner join forumtheads_img fti "
+				+ "left join forumtheads_img fti "
 				+ "on ft.guid=fti.forumthreadsguid where ft.guid=? and ft.isUsed=true";
 		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
 		PreparedStatement ps=null;
@@ -61,7 +61,9 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 				ft.setPhone(rs.getString("phone"));
 				String content=rs.getString("content");
 				ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
-				imgs.add(this.webUrl+rs.getString("imgpath"));
+				if(rs.getString("imgpath")!=null){
+					imgs.add(this.webUrl+rs.getString("imgpath"));
+				}
 			}
 			ft.setImages(imgs);
 			
@@ -171,8 +173,9 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 
 	public ArrayList<ForumThreads> queryAll() {
 		// TODO Auto-generated method stub
-		String sql="SELECT ft.id,ut.userId,ft.guid,ft.title,ft.content,ft.phone,ft.createDate,"
-				+" fti.imgpath from users_forumthreads ut LEFT JOIN forumthreads ft on ut.forumThreadsGuid=ft.guid"
+		String sql="SELECT ft.id,ut.userId,m.memLogName,ft.guid,ft.title,ft.content,ft.phone,ft.createDate,"
+				+" fti.imgpath from users_forumthreads ut INNER join member m on ut.userId=m.id "
+				+ "LEFT JOIN forumthreads ft on ut.forumThreadsGuid=ft.guid"
 				+" LEFT join forumtheads_img fti on ft.guid=fti.forumthreadsguid where ft.isUsed=true"
 				+" GROUP BY ft.guid ORDER BY ft.id";
 
@@ -189,13 +192,16 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 			while(rs.next()){
 				ForumThreads ft=new ForumThreads();
 				ArrayList<String> strs=new ArrayList<String>();
-				strs.add(this.webUrl+rs.getString("imgpath"));
 				
+				if(rs.getString("imgpath")!=null){
+					strs.add(this.webUrl+rs.getString("imgpath"));
+				}
 				ft.setImages(strs);
 				ft.setId(rs.getInt("id"));
 				ft.setUid(rs.getString("userId"));
 				ft.setGuid(rs.getString("guid"));
 				ft.setPhone(rs.getString("phone"));
+				ft.setUserName(rs.getString("memLogName"));
 				ft.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rs.getString("createDate")));
 				ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
 				String content=rs.getString("content");

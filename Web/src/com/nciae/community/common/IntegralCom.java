@@ -44,7 +44,7 @@ public class IntegralCom {
 		}
 		
 		if(otype.equals("buycommodity")){
-			if(cid.equals("")){
+			if(cid==null || cid.equals("")){
 				json.put("result", "fail");
 				json.put("info", "兑换积分功能需要传递商品的Id");
 				pw.write(json.toString());
@@ -63,10 +63,19 @@ public class IntegralCom {
 		
 		boolean result=true;
 		Integral newInte=null;
+		
 		//如果该用户不存在，则执行写入数据操作
 		if(inte==null){
+			
+			if(otype.equals("buycommodity")){
+				json.put("result", "fail");
+				json.put("info", "该用户暂无积分，不能兑换商品");
+				pw.write(json.toString());
+				return false;
+			}
+			
 			if(Itype.isAddOrdecrease()){
-				this.integralDaoImpl.InsertIntegral(integral);
+				result=this.integralDaoImpl.InsertIntegral(integral);
 			}else{
 				json.put("result", "fail");
 				json.put("info", "该用户积分不足");
@@ -74,17 +83,26 @@ public class IntegralCom {
 				return false;
 			}
 		}else{
+
+			if(otype.equals("buycommodity")){
+				if(Itype.getFraction()>inte.getFraction()){
+					json.put("result", "fail");
+					json.put("info", "该用户积分不足");
+					pw.write(json.toString());
+					return false;
+				}
+			}
+			
+			integral.setUserName(inte.getUserName());
 			if(Itype.isAddOrdecrease()){
 				result=this.integralDaoImpl.AddIntegral(integral);
 			}else{
 				result=this.integralDaoImpl.SubtractIntegral(integral);
 			}
-			
-			if(result){
-				newInte=this.integralDaoImpl.QueryIntegral(uid.toString());
-			}
 		}
-		
+		if(result){
+			newInte=this.integralDaoImpl.QueryIntegral(uid.toString());
+		}
 		
 		if(newInte!=null){
 			json.put("result", "success");

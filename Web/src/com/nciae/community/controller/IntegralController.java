@@ -28,6 +28,7 @@ import com.nciae.community.domain.DailyLives;
 import com.nciae.community.domain.DailyLivesType;
 import com.nciae.community.domain.Integral;
 import com.nciae.community.domain.IntegralCommodity;
+import com.nciae.community.domain.IntegralType;
 
 /*
  * 积分功能
@@ -119,7 +120,7 @@ public class IntegralController {
 	
 	@RequestMapping("integral_page")
 	public String integral_Page(){
-		return "integral/query";
+		return "integral/integral_manage";
 	}
 	/*public String CalcIntegral(Integral integral,PrintWriter pw){
 		Integral inte=this.integralDaoImpl.QueryIntegral(Integer.toString(integral.getUserId()));
@@ -150,7 +151,8 @@ public class IntegralController {
 	}
 	*/
 	@RequestMapping("getByUid")
-	public void GetIntegralByUid(HttpServletRequest request,String uid,PrintWriter pw){
+	public void GetIntegralByUid(HttpServletRequest request,PrintWriter pw){
+		String uid=request.getParameter("uid");
 		JSONObject json=new JSONObject();
 		if(uid==""){
 			json.put("result", "failed");
@@ -171,19 +173,40 @@ public class IntegralController {
 	}
 
 	@RequestMapping("modifyoperate")
-	public String ModifyOperate(HttpServletRequest request,PrintWriter pw){
+	public void ModifyOperate(HttpServletRequest request,PrintWriter pw){
 		
-		String otype=request.getParameter("operateType");
+		String otype=request.getParameter("operatetype");
 		JSONObject json=new JSONObject();
 		if(otype.equals("")){
 			json.put("result", "fail");
 			json.put("info", "增加积分出错，请选择操作的类型");
 			pw.write(json.toString());
-			return "integral/modifyoperate";
+			return;
 		}
-		request.getParameter("fraction");
-		request.getParameter("addOrdecrease");
-		return "integral/modifyoperate";
+		int fraction=Integer.parseInt(request.getParameter("fraction"));
+		boolean isAdd=Boolean.parseBoolean(request.getParameter("addOrdecrease"));
+		IntegralType integralType=new IntegralType();
+		integralType.setOperateType(otype);
+		integralType.setAddOrdecrease(isAdd);
+		integralType.setFraction(fraction);
+		
+		boolean result=this.integralDaoImpl.Update_Integral_Type(integralType);
+		if(!result){
+			json.put("result", "fail");
+			json.put("info", "更新失败");
+		}else{
+			json.put("result", "success");
+			json.put("info", "更新成功");
+		}
+		pw.write(json.toString());
+		return;
+	}
+	
+	@RequestMapping("updateType")
+	public String UpdateType(HttpServletRequest request,PrintWriter pw){
+		IntegralType type=this.integralDaoImpl.QueryOneByType("phonecall");
+		request.setAttribute("type", type);
+		return "integral/updateType";
 	}
 	
 	@RequestMapping("modify_fraction")
@@ -196,6 +219,10 @@ public class IntegralController {
 	@RequestMapping("jumpToFraciton")
 	public String JumpToFraciton(){
 		return "integral/modify_fraction";
+	}
+	@RequestMapping("jumpToquery")
+	public String JumpToQuery(){
+		return "integral/query";
 	}
 	
 	@RequestMapping(value="getallcommodity",method=RequestMethod.POST)

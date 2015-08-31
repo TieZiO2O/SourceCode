@@ -3,6 +3,7 @@ encoding//WebContent/WEB-INF/jsp/dailyLives/query.jsp=UTF-8
 encoding//WebContent/WEB-INF/jsp/forumThreads/list.jsp=UTF-8
 encoding//WebContent/WEB-INF/jsp/forumThreads/query.jsp=UTF-8
 encoding//WebContent/WEB-INF/jsp/integral/getOne.jsp=UTF-8
+encoding//WebContent/WEB-INF/jsp/integral/integral_manage.jsp=UTF-8
 encoding//WebContent/WEB-INF/jsp/integral/modify_fraction.jsp=UTF-8
 encoding//WebContent/WEB-INF/jsp/property/showbulletin.jsp=UTF-8
 encoding//src/com/nciae/community/controller/MemberController.java=UTF-8

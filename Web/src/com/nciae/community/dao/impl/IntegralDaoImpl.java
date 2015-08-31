@@ -215,12 +215,20 @@ public class IntegralDaoImpl implements IntegralDao {
 	public boolean InsertIntegral(Integral integral){
 		boolean returnData=true;
 		String sql="INSERT into integral(userId,isUsed,fraction,userName)"
-				+ " SELECT u.id,1,?,u.userName from users u where u.userName=? group BY u.id limit 1";
+				+ " SELECT u.id,1,?,u.memLogName from member u where u.memLogName=? group BY u.id limit 1";
+		if(integral.getUserName()==null){
+			sql="INSERT into integral(userId,isUsed,fraction,userName)"
+					+ " SELECT u.id,1,?,u.memLogName from member u where u.id=? group BY u.id limit 1";
+		}
 		PreparedStatement ps=null;
 		try {
 			ps=dbServiceImpl.connect().prepareStatement(sql);
 			ps.setInt(1, integral.getFraction());
-			ps.setString(2, integral.getUserName());
+			if(integral.getUserName()==null){
+				ps.setInt(2, integral.getUserId());
+			}else{
+				ps.setString(2, integral.getUserName());
+			}
 			
 			int result=ps.executeUpdate();
 			
@@ -393,5 +401,44 @@ public class IntegralDaoImpl implements IntegralDao {
 		}
 		return ft;
 	}
+	
+	@Override
+	public boolean Update_Integral_Type(IntegralType integralType){
+		boolean returnData=true;
+		String sql="update integral_type set fraction=?,addOrdecrease=? where operateType=?";
+		PreparedStatement ps=null;
+		try {
+			ps=dbServiceImpl.connect().prepareStatement(sql);
+			ps.setInt(1, integralType.getFraction());
+			ps.setBoolean(2, integralType.isAddOrdecrease());
+			ps.setString(3, integralType.getOperateType());
+			int result=ps.executeUpdate();
+			
+			if (result>0) {
+				returnData=true;
+			}
+		} catch (Exception e) {
+			returnData=false;
+			// TODO: handle exception
+		}finally{
+			try {
+				dbServiceImpl.close();
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			if(ps!=null){
+				try {
+					ps.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return returnData;
+	}
+	
 
 }

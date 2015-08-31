@@ -8,6 +8,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.json.JSONObject;
+
+import org.apache.commons.logging.impl.Log4JLogger;
+import org.apache.log4j.Appender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.ErrorHandler;
+import org.apache.log4j.spi.Filter;
+import org.apache.log4j.spi.LoggingEvent;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +36,7 @@ import com.nciae.community.utils.MD5;
 @Controller
 @RequestMapping("/member")
 public class MemberController {
+	private Logger log=Logger.getLogger(getClass());
 	private MemberDaoImpl memberDaoImpl;
 	private DailyAbcDaoImpl dailyAbcDaoImpl;
 	private HappyMomentDaoImpl happyMomentDaoImpl;
@@ -333,14 +343,24 @@ public class MemberController {
 	public void mem_addCollection(HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			int userid = Integer
-					.parseInt(request.getParameter("userid").trim());
-			int memberid = Integer.parseInt(request.getParameter("memberid")
+			JSONObject json=new JSONObject();
+			String guid = request.getParameter("guid").trim();
+			String memid=request.getParameter("memberid");
+			PrintWriter out = null;
+			out = response.getWriter();
+			if(memid==null || memid.isEmpty()){
+				json.put("result", "fail");
+				json.put("info", "memeberid不能为null");
+				out.write(json.toString());
+				return;
+			}
+			
+			int memberid = Integer.parseInt(memid
 					.trim());
 			String result = null;
-			PrintWriter out = null;
-			if (memberDaoImpl.chkAlreadyCollection(userid, memberid)) {
-				if (memberDaoImpl.insertCollection(userid, memberid)) {
+			
+			if (memberDaoImpl.chkAlreadyCollection(guid,memberid)) {
+				if (memberDaoImpl.insertCollection(guid,memberid)) {
 					result = "success";
 				} else {
 					result = "failed";
@@ -348,8 +368,10 @@ public class MemberController {
 			} else {
 				result = "already";
 			}
-			out = response.getWriter();
-			out.write(result);
+			
+			json.put("result", result);
+			out.write(json.toString());
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -360,13 +382,12 @@ public class MemberController {
 	public void mem_deleteCollection(HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			int userid = Integer
-					.parseInt(request.getParameter("userid").trim());
+			String guid = request.getParameter("guid").trim();
 			int memberid = Integer.parseInt(request.getParameter("memberid")
 					.trim());
 			String result = null;
 			PrintWriter out = null;
-			if (memberDaoImpl.deleteCollection(userid, memberid)) {
+			if (memberDaoImpl.deleteCollection(guid,memberid)) {
 				result = "success";
 
 			} else {
@@ -374,7 +395,10 @@ public class MemberController {
 				result = "failed";
 			}
 			out = response.getWriter();
-			out.write(result);
+			JSONObject json=new JSONObject();
+			json.put("result", result);
+			
+			out.write(json.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -389,15 +413,22 @@ public class MemberController {
 					.trim());
 			String result = null;
 			PrintWriter out = null;
+			JSONObject json=new JSONObject();
 			if (memberDaoImpl.selectCollection(memberid) != null) {
 				ArrayList<Object> collectionlist = new ArrayList<Object>();
 				collectionlist = memberDaoImpl.selectCollection(memberid);
-				result = JsonUtil.toJsonString(collectionlist);
+								
+				json.put("result", "success");
+				json.put("info", JsonUtil.toJsonString(collectionlist));
+				
 			} else {
+				json.put("result", "fail");
+				json.put("info","查询失败");
+				
 				result = "null";
 			}
 			out = response.getWriter();
-			out.write(result);
+			out.write(json.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -476,29 +507,29 @@ public class MemberController {
 	}
 	*/
 	// 查询单个商家信息
-		@RequestMapping(value = "mem_selectsingleshopinfo", method = RequestMethod.POST)
-		public void mem_selectSingleShopInfo(HttpServletRequest request,
-				HttpServletResponse response) {
-			try {
-				Integer shopid = Integer.parseInt(request.getParameter("shopid")
-						.trim());
-				String result = null;
-				PrintWriter out = null;
-				if (memberDaoImpl.selectSingleShopInfo(shopid) != null) {
-					Merchants mer = new Merchants();
-					mer = memberDaoImpl.selectSingleShopInfo(shopid);
-					//result = JsonUtil.ToJsonStringMerchants(mer);
-					result=JsonUtil.toJsonStringObject(mer);
-					
-				} else {
-					result = "null";
-				}
-				out = response.getWriter();
-				out.write(result);
-			} catch (Exception e) {
-				e.printStackTrace();
+	@RequestMapping(value = "mem_selectsingleshopinfo", method = RequestMethod.POST)
+	public void mem_selectSingleShopInfo(HttpServletRequest request,
+			HttpServletResponse response) {
+		try {
+			Integer shopid = Integer.parseInt(request.getParameter("shopid")
+					.trim());
+			String result = null;
+			PrintWriter out = null;
+			if (memberDaoImpl.selectSingleShopInfo(shopid) != null) {
+				Merchants mer = new Merchants();
+				mer = memberDaoImpl.selectSingleShopInfo(shopid);
+				//result = JsonUtil.ToJsonStringMerchants(mer);
+				result=JsonUtil.toJsonStringObject(mer);
+				
+			} else {
+				result = "null";
 			}
+			out = response.getWriter();
+			out.write(result);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+	}
 
 
 	// 申请开店
@@ -675,45 +706,45 @@ public class MemberController {
 		}
 	}*/
 	//获取城市小区
-			@RequestMapping(value = "mem_selectcommunity", method = RequestMethod.POST)
-			public void mem_selectCommunity(HttpServletRequest request,
-					HttpServletResponse response) {
-				String city=request.getParameter("city");
-				//String city="廊坊";
-				//String tmpcity="廊坊";
-				Integer cityId=0;
-				try {
-					String result = null;
-					PrintWriter out = null;
-					ArrayList<Object> adlist = new ArrayList<Object>();
-					String cityid=memberDaoImpl.selectCityId(city);
-					if (cityid.length()!=0) {
-						cityId=Integer.parseInt(cityid);
-						adlist = memberDaoImpl.selectCommunity(cityId);
-						//System.out.println(adlist);
-						if (adlist != null) {
-							//result = JsonUtil.toJsonString(adlist);
-							result="";
-							for(int i=0;i<adlist.size();i++){
-								result+=adlist.get(i);
-								if(i<(adlist.size()-1)){
-									result+=",";
-								}
-							}
-							System.out.println(result);
-						} else {
-							result = "";
+	@RequestMapping(value = "mem_selectcommunity", method = RequestMethod.POST)
+	public void mem_selectCommunity(HttpServletRequest request,
+			HttpServletResponse response) {
+		String city=request.getParameter("city");
+		//String city="廊坊";
+		//String tmpcity="廊坊";
+		Integer cityId=0;
+		try {
+			String result = null;
+			PrintWriter out = null;
+			ArrayList<Object> adlist = new ArrayList<Object>();
+			String cityid=memberDaoImpl.selectCityId(city);
+			if (cityid.length()!=0) {
+				cityId=Integer.parseInt(cityid);
+				adlist = memberDaoImpl.selectCommunity(cityId);
+				//System.out.println(adlist);
+				if (adlist != null) {
+					//result = JsonUtil.toJsonString(adlist);
+					result="";
+					for(int i=0;i<adlist.size();i++){
+						result+=adlist.get(i);
+						if(i<(adlist.size()-1)){
+							result+=",";
 						}
 					}
-					else {
-						result = "";
-					}
-					out = response.getWriter();
-					out.write(result);
-					
-				} catch (Exception e) {
-					e.printStackTrace();
+					System.out.println(result);
+				} else {
+					result = "";
 				}
 			}
+			else {
+				result = "";
+			}
+			out = response.getWriter();
+			out.write(result);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 }

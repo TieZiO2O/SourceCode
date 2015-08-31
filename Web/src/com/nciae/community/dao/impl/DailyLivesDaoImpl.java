@@ -8,12 +8,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-import org.apache.commons.codec.binary.Base64;
-
-import com.nciae.community.dao.*;
+import com.nciae.community.dao.DailyLivesDao;
 import com.nciae.community.domain.DailyLives;
 import com.nciae.community.domain.DailyLivesType;
-import com.nciae.community.domain.DailyLives;
 import com.nciae.community.domain.DailyLives_SeperateTypes;
 import com.nciae.community.service.impl.DatabaseServiceImpl;
 
@@ -40,10 +37,10 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 	@Override
 	public DailyLives queryByGuid(String guid) {
 		// TODO Auto-generated method stub
-		String sql="select dl.isUsed,dl.guid,dl.customerNotice,dl.address,dl.phone,dl.title,"
+		String sql="select dl.id,dl.isUsed,dl.user_id,dl.guid,dl.customerNotice,dl.address,dl.phone,dl.title,"
 					+"dl.content,dl.createDate,dl.updateDate,di.img_path"
 					+" from dailylives dl" 
-					+" LEFT join dailylives_img di on dl.guid=di.dailylives_guid and dl.isUsed<>0 where dl.guid=?";
+					+" inner join dailylives_img di on dl.guid=di.dailylives_guid where dl.guid=? and dl.isUsed<>0";
 		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -52,13 +49,14 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 			ps=this.dbServiceImpl.connect().prepareStatement(sql);
 			ps.setString(1, guid);
 			rs=ps.executeQuery();
-		
 			
 			ft=new DailyLives();
 			ArrayList<String> imgs=new ArrayList<String>();
+		
 			while(rs.next()){
 				imgs.add(this.webUrl+rs.getString("img_path"));
 				ft.setId(rs.getInt("id"));
+				ft.setUid(rs.getString("user_id"));
 				ft.setGuid(rs.getString("guid"));
 				ft.setAddress(rs.getString("address"));
 				ft.setCustomerNotice(rs.getString("customerNotice"));
@@ -88,13 +86,81 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 	}
 
 	@Override
-	public ArrayList<DailyLives> queryAllByUid(String uid) {
+	public ArrayList<DailyLives> queryAll() {
 		// TODO Auto-generated method stub
-		String sql="SELECT ft.id,ft.guid,"
+		
+		String sql="select dt.serviceType,dt.style,dl.id,dl.guid,dl.customerNotice,dl.address,"
+				+ "dl.phone,dl.title,dl.content,dl.createDate,dl.updateDate,di.img_path"
+				 +" from dailylives dl LEFT join dailylives_type dt on dt.id=dl.dailylives_type_id "
+				 + "INNER join dailylives_img di on dl.guid=di.dailylives_guid where dl.isUsed=true order by dt.id";
+		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		ArrayList<DailyLives> fts=null;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			rs=ps.executeQuery();
+			
+			fts=new ArrayList<DailyLives>();
+			while(rs.next()){
+				Iterator<DailyLives> dlvs=fts.iterator();
+				DailyLives ft=null;
+				int index=0;
+				int count=0;
+				while(dlvs.hasNext()){
+					DailyLives dl=dlvs.next();
+					if(dl.getGuid().equals(rs.getString("guid"))){
+						ft=dl;
+						index=count;
+						break;
+					}
+					count++;
+				}
+				if(ft==null){
+					ft=new DailyLives();
+					DailyLivesType dlt=new DailyLivesType();
+					dlt.setServiceType(rs.getString("serviceType"));
+					dlt.setStyle(rs.getString("style"));
+					ft.setDailyLivesType(dlt);
+					ArrayList<String> imgs=new ArrayList<String>();
+					imgs.add(this.webUrl+rs.getString("img_path"));
+					ft.setImages(imgs);
+					ft.setId(rs.getInt("id"));
+					ft.setGuid(rs.getString("guid"));
+					ft.setPhone(rs.getString("phone"));
+					ft.setAddress(rs.getString("address"));
+					ft.setCustomerNotice(rs.getString("customerNotice"));
+					ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+					String content=rs.getString("content");
+					ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
+					fts.add(ft);
+				}else{
+					fts.get(index).getImages().add(this.webUrl+rs.getString("img_path"));
+				}
+				
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			fts=null;
+		}finally{
+			if(ps!=null){
+				try {
+					ps.close();
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return fts;
+			/*String sql="SELECT ft.id,ft.guid,"
 				+ "ft.title,ft.content,ft.createDate,ft.phone from "
 				+ "users_DailyLives uf inner join "
-				+ "DailyLives ft on uf.DailyLivesGuid=ft.guid "
-				+ "where uf.userId=?";
+				+ "DailyLives ft on uf.DailyLivesGuid=ft.guid ";
+				
 		
 		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
 		
@@ -103,7 +169,11 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 		ArrayList<DailyLives> fts=null;
 		try {
 			ps=this.dbServiceImpl.connect().prepareStatement(sql);
-			ps.setString(1, uid);
+			if(!uid.equals("")){
+				sql=sql+"where uf.userId=?";
+				ps.setString(1, uid);
+			}
+			
 			rs=ps.executeQuery();
 			
 			fts=new ArrayList<DailyLives>();
@@ -132,6 +202,104 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 				}
 			}
 		}
+		return fts;*/
+	}
+
+	@Override
+	public ArrayList<DailyLives> query_By_titleorphone(String title,String phone) {
+		// TODO Auto-generated method stub
+			
+		String sql="select dt.serviceType,dt.style,dl.id,dl.guid,dl.customerNotice,dl.address,"
+					+ "dl.phone,dl.title,dl.content,dl.createDate,dl.updateDate,di.img_path"
+					 +" from dailylives dl LEFT join dailylives_type dt on dt.id=dl.dailylives_type_id "
+					 + "inner join dailylives_img di on dl.guid=di.dailylives_guid";
+	
+		if(title.equals("")){
+			if(!phone.equals("")){
+				sql+=" where dl.isUsed=true and dl.phone=? order by dt.id";
+			}else{
+				sql+=" where dl.isUsed=true order by dt.id";
+			}
+		}else{
+			if(phone.equals("")){
+				sql+=" where dl.isUsed=true and dl.title=? order by dt.id";
+			}else{
+				sql+=" where dl.isUsed=true and dl.phone=? and dl.title=? order by dt.id";
+			}
+		}
+		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		ArrayList<DailyLives> fts=null;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			if(title.equals("")){
+				if(!phone.equals("")){
+					ps.setString(1, phone);
+				}
+			}else{
+				ps.setString(1, new String(base64.encode(title.getBytes("utf-8"))));
+				if(!phone.equals("")){
+					ps.setString(2, phone);
+				}
+			}
+			rs=ps.executeQuery();
+			
+			fts=new ArrayList<DailyLives>();
+			while(rs.next()){
+				Iterator<DailyLives> dlvs=fts.iterator();
+				DailyLives ft=null;
+				int index=0;
+				int count=0;
+				while(dlvs.hasNext()){
+					DailyLives dl=dlvs.next();
+					if(dl.getGuid().equals(rs.getString("guid"))){
+						ft=dl;
+						index=count;
+						break;
+					}
+					count++;
+				}
+				if(ft==null){
+					ft=new DailyLives();
+					DailyLivesType dlt=new DailyLivesType();
+					dlt.setServiceType(rs.getString("serviceType"));
+					dlt.setStyle(rs.getString("style"));
+					ft.setDailyLivesType(dlt);
+					ArrayList<String> imgs=new ArrayList<String>();
+					imgs.add(this.webUrl+rs.getString("img_path"));
+					ft.setImages(imgs);
+					ft.setId(rs.getInt("id"));
+					ft.setCreateDate(new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString("createDate")));
+					ft.setGuid(rs.getString("guid"));
+					ft.setPhone(rs.getString("phone"));
+					ft.setAddress(rs.getString("address"));
+					ft.setCustomerNotice(rs.getString("customerNotice"));
+					ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+					String content=rs.getString("content");
+					ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
+					fts.add(ft);
+				}else{
+					fts.get(index).getImages().add(this.webUrl+rs.getString("img_path"));
+				}
+				
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			fts=null;
+		}finally{
+			if(ps!=null){
+				try {
+					ps.close();
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
 		return fts;
 	}
 
@@ -141,8 +309,8 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 		String sql="select dl.id,dl.guid,dl.customerNotice,dl.address,dl.phone,dl.title,"
 					+"dl.content,dl.createDate,dl.updateDate,di.img_path"
 					+" from dailylives_type dt"
-					+" LEFT join dailylives dl on dt.id=dl.dailylives_type_id and dl.isUsed<>0"
-					+" LEFT join dailylives_img di on dl.guid=di.dailylives_guid where dt.id=? order by dt.id;";
+					+" LEFT join dailylives dl on dt.id=dl.dailylives_type_id"
+					+" inner join dailylives_img di on dl.guid=di.dailylives_guid where dt.id=? and dl.isUsed=true order by dt.id;";
 				/*"select dt.id,dt.serviceType,dt.style,dt.logoPath,dl.guid,dl.customerNotice,dl.address,dl.phone,dl.title,"
 					+"dl.content,dl.createDate,dl.updateDate,di.img_path"
 					+" from dailylives_type dt "
@@ -179,7 +347,8 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 					imgs.add(this.webUrl+rs.getString("img_path"));
 					ft.setImages(imgs);
 					ft.setId(rs.getInt("id"));
-					ft.setGuid(rs.getString("guid"));
+					ft.setGuid(rs.getString("guid"));				
+					ft.setCreateDate(new SimpleDateFormat("yyyy-MM-dd").parse(rs.getString("createDate")));
 					ft.setPhone(rs.getString("phone"));
 					ft.setAddress(rs.getString("address"));
 					ft.setCustomerNotice(rs.getString("customerNotice"));
@@ -252,7 +421,8 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 		boolean isTrue=true;
 		try {
 			String dateNow=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-			String sql="insert into DailyLives(guid,dailylives_type_id,customerNotice,address,title,content,phone,createDate) values(?,?,?,?,?,?,?,?)";
+			String sql="insert into DailyLives(guid,dailylives_type_id,customerNotice,address,"
+					+ "title,content,phone,createDate,user_id,isMainList,communitys) values(?,?,?,?,?,?,?,?,?,?,?)";
 			ps=dbServiceImpl.connect().prepareStatement(sql);
 			ps.setString(1, DailyLives.getGuid());
 			ps.setInt(2, DailyLives.getDailyLivesId());
@@ -262,6 +432,9 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 			ps.setString(6, DailyLives.getContent());
 			ps.setString(7, DailyLives.getPhone());
 			ps.setDate(8, new java.sql.Date(new Date().getTime()));
+			ps.setInt(9, Integer.parseInt(DailyLives.getUid()));
+			ps.setBoolean(10, DailyLives.isMainList());
+			ps.setString(11, DailyLives.getCommunitys());
 			
 			int reuslt=ps.executeUpdate();
 			
@@ -311,6 +484,46 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 		return isTrue;
 	}
 
+	/**
+	 * @param id，服务的id
+	 * @return true,删除成功；false，删除失败
+	 * */
+	@Override
+	public boolean delete_DailyLivesType_ById(int id){
+		boolean returnData=true;
+		String sql="delete from dailylives_type where id=?";
+		PreparedStatement ps=null;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			ps.setInt(1, id);
+			int result=ps.executeUpdate();
+			if(result>0){
+				returnData=true;
+			}else{
+				returnData=false;
+			}
+		} catch (Exception e) {
+			returnData=false;
+			// TODO: handle exception
+		}finally{
+			if(ps!=null){
+				try {
+					try {
+						this.dbServiceImpl.close();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					ps.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return returnData;
+	}
 	@Override
 	public boolean addDailyLivesImgs(ArrayList<String> imgPaths,String guid) {
 		// TODO Auto-generated method stub
@@ -405,8 +618,9 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 		return dailyTypes;
 	} 
 	
-	/*
-	 * 获取所有的服务类型，已经分类好的
+	/**
+	 * @see 获取所有的服务类型，已经分类好的
+	 * @return DailyLives_SeperateTypes
 	 * */
 	public DailyLives_SeperateTypes SelectAllDailyLivesTypsBySerperate(){
 		DailyLives_SeperateTypes dailyTypes=null;
@@ -462,4 +676,45 @@ public class DailyLivesDaoImpl implements DailyLivesDao {
 		return dailyTypes;
 	} 
 	
+	/**
+	 * @param guid，服务的guid
+	 * @return true,删除成功；false，删除失败
+	 * */
+	@Override
+	public boolean delete_DailyLives_ById(String guid){
+		boolean returnData=true;
+		String sql="update dailylives set isUsed=false where guid=?";
+		PreparedStatement ps=null;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(1, guid);
+			int result=ps.executeUpdate();
+			if(result>0){
+				returnData=true;
+			}else{
+				returnData=false;
+			}
+		} catch (Exception e) {
+			returnData=false;
+			// TODO: handle exception
+		}finally{
+			if(ps!=null){
+				try {
+					try {
+						this.dbServiceImpl.close();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					ps.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return returnData;
+	}
+
 }

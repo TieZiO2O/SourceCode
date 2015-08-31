@@ -22,6 +22,10 @@ import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONString;
 
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggerFactory;
+import org.apache.log4j.spi.LoggerRepository;
 import org.apache.tomcat.util.buf.Utf8Encoder;
 import org.apache.tomcat.util.codec.EncoderException;
 import org.apache.tomcat.util.codec.binary.StringUtils;
@@ -46,7 +50,7 @@ import com.nciae.community.utils.JsonUtil;
 @RequestMapping("/forumThreads")
 public class ForumThreadController {
 	private ForumThreadDaoImpl forumThreadDaoImpl;
-	
+	private static final Logger logger=Logger.getLogger(ForumThreadController.class);
 	/*
 	 * 增加新帖
 	 * 需要参数：tile,帖子题目；content,帖子内容；phone,电话号码；uid,当前添加新帖用的id
@@ -138,67 +142,21 @@ public class ForumThreadController {
 		CommonsMultipartResolver resolver=new CommonsMultipartResolver(request.getSession().getServletContext());
 		ArrayList<String> imgs=null;
 		imgs=new ArrayList<String>();
-
+		
 		//判断是否有多文件上传
 		if(resolver.isMultipart(request)){
 			MultipartHttpServletRequest mutiRequest=(MultipartHttpServletRequest)request;
 			HttpSession session=request.getSession();
 			int index=0;
-			Iterator<String> iter=mutiRequest.getFileNames();
 			
-			
-			Iterator<MultipartFile> mutiFiles=mutiRequest.getFiles(iter.next()).iterator();
-			while(mutiFiles.hasNext()){
+			Iterator<MultipartFile> files=mutiRequest.getFiles("file").iterator();
+			//Iterator<MultipartFile> mutiFiles=mutiRequest.getFiles(iter.next()).iterator();
+			/*while(files.hasNext()){
 				
 				//System.out.println("=====图片路径："+iter.next()+"=======");
 				index++;
 				//获取当前文件
-				MultipartFile file=mutiFiles.next();
-				//获取远程文件的地址
-				String fileOldPath=file.getOriginalFilename();
-				
-				//获取用户Id
-				String id=request.getParameter("uid");
-				//设置文件保存地址
-				String path="/img/forumThreadsImg";
-				path=path+"/"+id+"/"+guid;
-				
-				//获取文件保存地址
-				String fileRealPath=mutiRequest.getSession().getServletContext().getRealPath(path);
-				File saveFile=new File(fileRealPath);
-				if(!saveFile.exists()){
-					saveFile.mkdirs();
-				}
-				
-				//获取文件后缀名
-				String extension=fileOldPath.substring(fileOldPath.indexOf(".")+1,fileOldPath.length()).toLowerCase();
-				//获取文件名
-				String fileName=fileOldPath.substring(0,fileOldPath.indexOf("."));
-				
-				SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
-				//新文件全名
-				String fileNewName=sdf.format(new Date())+"_"+index+"."+extension;
-				//新文件url
-				String fileUrl=fileRealPath+File.separator+fileNewName;
-				
-				//保存文件
-				File localFile=new File(fileUrl);
-				try {
-					file.transferTo(localFile);
-				} catch (IllegalStateException | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				imgs.add(path+"/"+fileNewName);
-			}
-			
-			
-			/*while(iter.hasNext()){
-			
-				//System.out.println("=====图片路径："+iter.next()+"=======");
-				index++;
-				//获取当前文件
-				MultipartFile file=mutiRequest.getFile(iter.next());
+				MultipartFile file=files.next();
 				//获取远程文件的地址
 				String fileOldPath=file.getOriginalFilename();
 				
@@ -236,6 +194,52 @@ public class ForumThreadController {
 				}
 				imgs.add(path+"/"+fileNewName);
 			}*/
+			Iterator<String> iter=mutiRequest.getFileNames();
+			
+			while(iter.hasNext()){
+			
+				//System.out.println("=====图片路径："+iter.next()+"=======");
+				index++;
+				String fileNameOld=iter.next();
+				//获取当前文件
+				MultipartFile file=mutiRequest.getFile(fileNameOld);
+				//获取远程文件的地址
+				String fileOldPath=file.getOriginalFilename();
+				
+				//获取用户Id
+				String id=request.getParameter("uid");
+				//设置文件保存地址
+				String path="/img/forumThreadsImg";
+				path=path+"/"+id+"/"+guid;
+				
+				//获取文件保存地址
+				String fileRealPath=mutiRequest.getSession().getServletContext().getRealPath(path);
+				File saveFile=new File(fileRealPath);
+				if(!saveFile.exists()){
+					saveFile.mkdirs();
+				}
+				
+				//获取文件后缀名
+				String extension=fileOldPath.substring(fileOldPath.indexOf(".")+1,fileOldPath.length()).toLowerCase();
+				//获取文件名
+				String fileName=fileOldPath.substring(0,fileOldPath.indexOf("."));
+				
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
+				//新文件全名
+				String fileNewName=sdf.format(new Date())+"_"+index+"."+extension;
+				//新文件url
+				String fileUrl=fileRealPath+File.separator+fileNewName;
+				
+				//保存文件
+				File localFile=new File(fileUrl);
+				try {
+					file.transferTo(localFile);
+				} catch (IllegalStateException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				imgs.add(path+"/"+fileNewName);
+			}
 		}
 		return imgs;
 	}
@@ -362,8 +366,12 @@ public class ForumThreadController {
 		
 		json.put("result", "success");
 		json.put("info", fts);
+		
+		logger.info("==========开始时间："+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()).toString()+"==========");
+		logger.info(json.toString());
+		logger.info("==========结束时间："+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()).toString()+"==========");
+		
 		pw.write(json.toString());
-		System.out.println(fts.get(0).getContent());
 		return;
 	}
 

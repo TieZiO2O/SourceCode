@@ -34,6 +34,10 @@ public class DailyLivesController {
 	
 	private DailyLivesDaoImpl dailyLivesDaoImpl;
 	
+	/**
+	 * 增加新的服务
+	 * @param title,服务的标题；style,服务所属的服务类型；customerNotice,顾客须知；
+	 * */
 	@RequestMapping("add")
 	public String AddService(HttpServletRequest request,PrintWriter pw){
 		
@@ -44,13 +48,26 @@ public class DailyLivesController {
 			json.put("info", "服务标题不能为空");
 			return "dailyLives/add";
 		}
+		
+		boolean isMainList=Boolean.valueOf(request.getParameter("isMainList"));
 
 		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
 		String guid=UUID.randomUUID().toString();
 		DailyLives dailyLives=new DailyLives();
 		dailyLives.setGuid(guid);
-		dailyLives.setDailyLivesId(Integer.parseInt(request.getParameter("style")));
+		
+		if(!isMainList){
+			dailyLives.setDailyLivesId(Integer.parseInt(request.getParameter("style")));
+		}else{
+			dailyLives.setDailyLivesId(0);
+		}
+		
 		dailyLives.setCustomerNotice(request.getParameter("customerNotice"));
+		dailyLives.setMainList(isMainList);
+		//获取小区集合
+		String communtiys=request.getParameter("hidCom");
+		dailyLives.setCommunitys(communtiys);
+		
 		try {
 			dailyLives.setTitle(new String(base64.encode(request.getParameter("title").getBytes("utf-8"))));
 		} catch (UnsupportedEncodingException e1) {
@@ -64,9 +81,13 @@ public class DailyLivesController {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		HttpSession session=request.getSession();
+		String userId=session.getAttribute("userid").toString();
 		dailyLives.setPhone(request.getParameter("phone"));
 		dailyLives.setAddress(request.getParameter("address"));
-
+		dailyLives.setUid(userId);
+		
+		
 		try {
 			result=this.dailyLivesDaoImpl.addNewDailyLives(dailyLives);
 		} catch (Exception e) {
@@ -89,7 +110,7 @@ public class DailyLivesController {
 			pw.write(json.toString());
 			return "dailyLives/add";
 		}
-		return this.getAllDailtypes(request,pw);
+		return this.GetAllDailtypes(request,pw);
 		
 	}
 	
@@ -148,6 +169,10 @@ public class DailyLivesController {
 		return imgs;
 	}
 	
+	/**
+	 * 获取所有的服务类型
+	 * @return 所有的服务类型
+	 * */
 	@RequestMapping("getAllDailyType")
 	public void GetAllDailyTypes(HttpServletRequest request,PrintWriter pw){
 		
@@ -170,7 +195,7 @@ public class DailyLivesController {
 	}
 	
 	@RequestMapping("getAllDailtypes")
-	private String getAllDailtypes(HttpServletRequest request,PrintWriter pw){
+	private String GetAllDailtypes(HttpServletRequest request,PrintWriter pw){
 		ArrayList<DailyLivesType> dailys=this.dailyLivesDaoImpl.SelectAllDailyLivesTypes();
 		
 		if(dailys!=null){
@@ -189,15 +214,42 @@ public class DailyLivesController {
 		return "dailyLives/add";
 	}
 	
+	/**
+	 * @param sid,要删除的服务的Id
+	 * */
+	@RequestMapping("deleteonedailytype")
+	public void DeleteOneDailyType(HttpServletRequest request,PrintWriter pw){
+		String sid=request.getParameter("sid");
+		JSONObject json=new JSONObject();
+		
+		if(sid.equals("")){
+			json.put("result", "fail");
+			json.put("info", "操作失败，需要传递对应的服务序列号");
+			pw.write(json.toString());
+			return;
+		}
+		
+		boolean data=this.dailyLivesDaoImpl.delete_DailyLivesType_ById(Integer.parseInt(sid));
+		if(data){
+			json.put("result", "success");
+			json.put("info", "操作成功");
+		}else{
+			json.put("result", "fail");
+			json.put("info", "操作失败，请重新操作");
+		}
+		pw.write(json.toString());
+		return;
+	}
+	
 	@RequestMapping("getAllServiceTypeBySid")
-	public String GetAllServiceTypeByServiceId(HttpServletRequest request,PrintWriter pw){
+	public void GetAllServiceTypeByServiceId(HttpServletRequest request,PrintWriter pw){
 		String id=request.getParameter("sid");
 		JSONObject json=new JSONObject();
 		if(id==""){
 			json.put("result", "fail");
 			json.put("info","需要服务Id来查询列表，但该服务Id并没有上传");
 			pw.write(json.toString());
-			return "dailyLives/query";
+			return;
 		}
 		
 		ArrayList<DailyLives> dls=this.dailyLivesDaoImpl.queryAllByServiceType(Integer.parseInt(id));
@@ -206,18 +258,18 @@ public class DailyLivesController {
 		json.put("info",dls);
 		pw.write(json.toString());
 		
-		return "dailyLives/query";
+		return;
 	}
 
 	@RequestMapping("getOneStypeByGid")
-	public String GetOneServiceTypeByGid(HttpServletRequest request,PrintWriter pw){
+	public void GetOneServiceTypeByGid(HttpServletRequest request,PrintWriter pw){
 		String guid=request.getParameter("guid");
 		JSONObject json=new JSONObject();
 		if (guid=="") {
 			json.put("result", "fail");
 			json.put("info", "查询服务的guid不能为空");
 			pw.write(json.toString());
-			return "dailyLives/query";
+			return;
 		}
 		
 		DailyLives dl=this.dailyLivesDaoImpl.queryByGuid(guid);
@@ -226,14 +278,14 @@ public class DailyLivesController {
 			json.put("result", "fail");
 			json.put("info", "查询失败");
 			pw.write(json.toString());
-			return "dailyLives/query";
+			return;
 		}
 		
 		json.put("result", "success");
 		json.put("info", dl);
 		pw.write(json.toString());
 		
-		return "dailyLives/query";
+		return;
 	}
 	
 	@RequestMapping("addservicetype")
@@ -258,7 +310,7 @@ public class DailyLivesController {
 				
 				String fileOldPath=file.getOriginalFilename();
 				//设置文件的保存地址
-				String path="/img/serviceLogo/";
+				String path="/img/serviceLogo";
 				String fileRealPath=mutireqeust.getSession().getServletContext().getRealPath(path);
 				File saveFile=new File(fileRealPath);
 				
@@ -301,11 +353,18 @@ public class DailyLivesController {
 			json.put("info", "添加失败");
 		}
 		pw.write(json.toString());
-		return "dailyLives/addservicetype";
+
+		ArrayList<DailyLivesType> dailyLives=this.dailyLivesDaoImpl.SelectAllDailyLivesTypes();
+		request.setAttribute("dailyLives", dailyLives);
+
+		return "dailyLives/query";
 	}
 	
 	@RequestMapping("query")
-	public String query(){
+	public String query(HttpServletRequest request,PrintWriter pw){
+
+		ArrayList<DailyLivesType> dailyLives=this.dailyLivesDaoImpl.SelectAllDailyLivesTypes();
+		request.setAttribute("dailyLives", dailyLives);
 		return "dailyLives/query";
 	}
 	
@@ -325,8 +384,20 @@ public class DailyLivesController {
 	}
 	
 	@RequestMapping("servicemanage")
-	public String serviceManage(){
+	public String serviceManage(HttpServletRequest request,PrintWriter pw){
+		String title=request.getParameter("title")==null ?"":request.getParameter("title");
+		String phone=request.getParameter("phone")==null?"":request.getParameter("phone");
+		
+		ArrayList<DailyLives> lives= this.dailyLivesDaoImpl.query_By_titleorphone(title, phone);
+		ArrayList<DailyLivesType> livesType=this.dailyLivesDaoImpl.SelectAllDailyLivesTypes();
+		request.setAttribute("dailyLives", lives);
+		request.setAttribute("dailyLivesType", livesType);
 		return "dailyLives/servicemanage";
+	}
+	
+	@RequestMapping("service")
+	public String serviceJump(){
+		return "dailyLives/service";
 	}
 	
 	public DailyLivesDaoImpl getDailyLivesDaoImpl() {
@@ -335,5 +406,28 @@ public class DailyLivesController {
 
 	public void setDailyLivesDaoImpl(DailyLivesDaoImpl dailyLivesDaoImpl) {
 		this.dailyLivesDaoImpl = dailyLivesDaoImpl;
+	}
+	
+	@RequestMapping("delete_dailylives_byguid")
+	public void DeleteDailyLivesByGuid(HttpServletRequest request,PrintWriter pw){
+		String guid=request.getParameter("guid");
+		JSONObject json=new JSONObject();
+		if(guid.equals("")){
+			json.put("result","fail");
+			json.put("info","guid，不能为空");
+			pw.write(json.toString());
+			return;
+		}
+		
+		boolean result=this.dailyLivesDaoImpl.delete_DailyLives_ById(guid);
+		if(result){
+			json.put("result","success");
+			json.put("info","删除成功");
+		}else{
+			json.put("result","fail");
+			json.put("info","删除失败");
+		}
+		pw.write(json.toString());
+		return;
 	}
 }

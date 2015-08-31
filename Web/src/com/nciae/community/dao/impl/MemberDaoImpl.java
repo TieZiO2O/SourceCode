@@ -1,5 +1,6 @@
 package com.nciae.community.dao.impl;
 
+import java.awt.List;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -8,6 +9,8 @@ import java.util.Date;
 import com.nciae.community.dao.MemberDao;
 import com.nciae.community.domain.Advertisement;
 import com.nciae.community.domain.Bulletin;
+import com.nciae.community.domain.DailyLives;
+import com.nciae.community.domain.DailyLivesType;
 import com.nciae.community.domain.Merchants;
 import com.nciae.community.domain.Property;
 import com.nciae.community.domain.ShopImg;
@@ -15,6 +18,7 @@ import com.nciae.community.service.impl.DatabaseServiceImpl;
 
 public class MemberDaoImpl implements MemberDao {
 	private DatabaseServiceImpl dbServiceImpl;
+	private final String webUrl="http://122.114.55.226:8080/Community";
 
 	public DatabaseServiceImpl getDbServiceImpl() {
 		return dbServiceImpl;
@@ -620,14 +624,14 @@ public class MemberDaoImpl implements MemberDao {
 	}
 
 	@Override
-	public boolean insertCollection(int userid, int memberid) throws Exception {
+	public boolean insertCollection(String guid, int memberid) throws Exception {
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		try {
-			String sql = "insert into collection(memId,shopperId) values(?,?)";
+			String sql = "insert into collection(memId,dailylives_guid) values(?,?)";
 			ps = dbServiceImpl.connect().prepareStatement(sql);
 			ps.setInt(1, memberid);
-			ps.setInt(2, userid);
+			ps.setString(2, guid);
 			int i = ps.executeUpdate();
 			if (i > 0) {
 				return true;
@@ -650,15 +654,15 @@ public class MemberDaoImpl implements MemberDao {
 	}
 
 	@Override
-	public boolean deleteCollection(int userid, int memberid) throws Exception {
+	public boolean deleteCollection(String guid, int memberid) throws Exception {
 		// TODO Auto-generated method stub
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		try {
-			String sql = "delete from collection where memId=? and shopperId=?";
+			String sql = "delete from collection where memId=? and dailylives_guid=?";
 			ps = dbServiceImpl.connect().prepareStatement(sql);
 			ps.setInt(1, memberid);
-			ps.setInt(2, userid);
+			ps.setString(2, guid);
 			int i = ps.executeUpdate();
 			if (i > 0) {
 				return true;
@@ -689,24 +693,41 @@ public class MemberDaoImpl implements MemberDao {
 		;
 		try {
 
-			String sql = "select realName,shopLogo from users where id=?";
+			String sql="select c.memId,dt.serviceType,dt.style,dl.id,dl.guid,dl.customerNotice,dl.address,"
+					+ "dl.phone,dl.title,dl.content,dl.createDate,dl.updateDate,di.img_path "
+					+ "from collection c LEFT join dailylives dl on c.dailylives_guid=dl.guid LEFT join dailylives_type dt on dt.id=dl.dailylives_type_id"
+					+ " INNER join dailylives_img di on dl.guid=di.dailylives_guid where dl.isUsed=true and c.memId=? group by c.dailylives_guid";
+			/*int shopidcount = (selectMenberCollectMerchantId(memberid).size()) - 1;*/
 
-			int shopidcount = (selectMenberCollectMerchantId(memberid).size()) - 1;
-
-			for (int i = 0; i <= shopidcount; i++) {
-				int shopid = selectMenberCollectMerchantId(memberid).get(i);
-				ps = dbServiceImpl.connect().prepareStatement(sql);
-				ps.setInt(1, shopid);
-				rs = ps.executeQuery();
-
-				while (rs.next()) {
-					Merchants merchants = new Merchants();
-					merchants.setId(shopid);
-					merchants.setShopLogo(rs.getString("shopLogo"));
-					merchants.setRealName(rs.getString("realName"));
-					list.add(merchants);
-				}
+			/*for (int i = 0; i <= shopidcount; i++) {
+				int shopid = selectMenberCollectMerchantId(memberid).get(i);*/
+			ps = dbServiceImpl.connect().prepareStatement(sql);
+			ps.setInt(1,memberid);
+			rs = ps.executeQuery();
+			
+			org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+			
+			while (rs.next()) {
+				DailyLives ft = new DailyLives();
+				DailyLivesType dlt=new DailyLivesType();
+				dlt.setServiceType(rs.getString("serviceType"));
+				dlt.setStyle(rs.getString("style"));
+				ft.setDailyLivesType(dlt);
+				ArrayList<String> imgs=new ArrayList<String>();
+				imgs.add(this.webUrl+rs.getString("img_path"));
+				ft.setImages(imgs);
+				ft.setId(rs.getInt("id"));
+				ft.setGuid(rs.getString("guid"));
+				ft.setPhone(rs.getString("phone"));
+				ft.setAddress(rs.getString("address"));
+				ft.setCustomerNotice(rs.getString("customerNotice"));
+				ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+				
+				String content=rs.getString("content");
+				ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
+				list.add(ft);
 			}
+			/*}*/
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -759,15 +780,15 @@ public class MemberDaoImpl implements MemberDao {
 	}
 
 	@Override
-	public boolean chkAlreadyCollection(int userid, int memberid)
+	public boolean chkAlreadyCollection(String guid, int memberid)
 			throws Exception {
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		try {
-			String sql = "select shopperId from collection where memId=? and shopperId=?";
+			String sql = "select dailylives_guid from collection where memId=? and dailylives_guid=?";
 			ps = dbServiceImpl.connect().prepareStatement(sql);
 			ps.setInt(1, memberid);
-			ps.setInt(2,userid);
+			ps.setString(2,guid);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				return false;
@@ -1002,29 +1023,40 @@ public class MemberDaoImpl implements MemberDao {
 		PreparedStatement ps = null;
 		ArrayList<Object> list = null;
 		try {
-			String sql = "select * from Advertisement";
+			String sql ="select dl.id,dl.guid,dl.customerNotice,dl.address,"
+					+ "dl.phone,dl.title,dl.content,dl.communitys,di.img_path"
+					 +" from dailylives dl INNER join dailylives_img di on "
+					 + "dl.guid=di.dailylives_guid where dl.isUsed=true and dl.isMainList=true "
+					 + "and (LOCATE(?,communitys)>0  or LENGTH(Trim(communitys))<1 or communitys is null) order by dl.id"; //"select * from dailylives where isMainList=true";
 			ps = dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(1, new String().valueOf(communityid));
 			rs = ps.executeQuery();
 			list = new ArrayList<Object>();
+			
+			org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+			
 			while (rs.next()) {
-				communitystringid = rs.getString("communityList");
+				ArrayList<String> imgs=new ArrayList<String>();
+				communitystringid = rs.getString("communitys");
 				if (communitystringid == null) {
-					Advertisement ad = new Advertisement();
-					ad.setShopperId(rs.getInt("shopperId"));
-					ad.setAdImagURL(rs.getString("adImagURL"));
-					ad.setAdTitle(rs.getString("adTitle"));
-					ad.setAdContent(rs.getString("adContent"));
+					DailyLives ad = new DailyLives();
+					ad.setGuid(rs.getString("guid"));
+					imgs.add(this.webUrl+rs.getString("img_path"));
+					ad.setImages(imgs);
+					ad.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+					ad.setContent(new String(base64.decode(rs.getString("content")),"utf-8"));
 					list.add(ad);
 				} else {
 					String communitystring[] = communitystringid.split(",");
 					for (int i = 0; i < communitystring.length; i++) {
 						String community = Integer.toString(communityid);
 						if (community.equals(communitystring[i])) {
-							Advertisement ad = new Advertisement();
-							ad.setShopperId(rs.getInt("shopperId"));
-							ad.setAdImagURL(rs.getString("adImagURL"));
-							ad.setAdTitle(rs.getString("adTitle"));
-							ad.setAdContent(rs.getString("adContent"));
+							DailyLives ad = new DailyLives();
+							ad.setGuid(rs.getString("guid"));
+							imgs.add(this.webUrl+rs.getString("img_path"));
+							ad.setImages(imgs);
+							ad.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+							ad.setContent(new String(base64.decode(rs.getString("content")),"utf-8"));
 							list.add(ad);
 						}
 					}

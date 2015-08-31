@@ -151,10 +151,11 @@
 				</tr>
 			</table>
 		</form>
-		<form action="${sessionScope.basePath }/integral/getallcommodity.do" method="POST">
+		<form action="${sessionScope.basePath }member/mem_selectads.do" method="POST">
+			<input type="text" value="1" name="communityid">
 			<input type="submit" value="添加"/>
 		</form>
-		<form action="${sessionScope.basePath }forumThreads/getAllByUid.do" method="POST">
+		<form action="${sessionScope.basePath }forumThreads/getAll.do" method="POST">
 			<input type="text" value="" name="uid">
 			<input type="submit" value="提交"/>
 		</form>

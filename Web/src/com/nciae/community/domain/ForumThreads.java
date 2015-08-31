@@ -14,6 +14,7 @@ public class ForumThreads {
 	private String content;
 	private String phone;
 	private Date createDate;
+	private String userName;
 	private ArrayList<String> images;
 	public ArrayList<String> getImages() {
 		return images;
@@ -67,8 +68,14 @@ public class ForumThreads {
 	public String toString() {
 		return "ForumThreads [id=" + id + ", uid=" + uid + ", guid=" + guid
 				+ ", title=" + title + ", content=" + content + ", phone="
-				+ phone + ", createDate=" + createDate + ", images=" + images
-				+ "]";
+				+ phone + ", createDate=" + createDate + ", userName="
+				+ userName + ", images=" + images + "]";
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 }

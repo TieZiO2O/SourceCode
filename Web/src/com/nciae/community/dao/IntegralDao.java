@@ -12,4 +12,5 @@ public interface IntegralDao {
 	public IntegralType QueryOneByType(String type);
 	/*ArrayList<Integral> QueryIntegrals(String userName);*/
 	public Integral QueryIntegral(String userId);
+	boolean Update_Integral_Type(IntegralType integralType);
 }

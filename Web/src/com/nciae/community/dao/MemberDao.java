@@ -87,14 +87,14 @@ public Property selectProertyInfo(int communityid)throws Exception;
  * @param memberID
  * @return
  */
-public boolean insertCollection(int userid,int memberid)throws Exception;
+public boolean insertCollection(String guid, int memberid) throws Exception;
 /**
  * 删除用户收藏的商家
  * @param userID
  * @param memberID
  * @return
  */
-public boolean deleteCollection(int userid,int memberid)throws Exception;
+public boolean deleteCollection(String guid, int memberid) throws Exception;
 /**
  * 查询用户收藏
  * @param memid
@@ -114,7 +114,7 @@ public boolean insertReply(int communityid,String msg,int memid)throws Exception
  * @param memberID
  * @return
  */
-public boolean chkAlreadyCollection(int userid,int memberid)throws Exception;
+public boolean chkAlreadyCollection(String guid, int memberid) throws Exception;
 /**
  * 为客户端返回广告
  * @return
@@ -172,5 +172,8 @@ ArrayList<Object> selectCommunity(int cityid) throws Exception;
  * @throws Exception
  */
 String selectCityId(String city) throws Exception;
+
+
+
 }
 
