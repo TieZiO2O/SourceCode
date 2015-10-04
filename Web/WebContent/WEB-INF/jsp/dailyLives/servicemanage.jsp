@@ -10,11 +10,12 @@
 	<script type="text/javascript" src="${pageContext.request.contextPath}/scripts/fileinput.min.js"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/scripts/fileinput_locale_zh.js"></script>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/scripts/jquery.validate.min.js"></script>
+	<script type="text/javascript" src="${pageContext.request.contextPath}/scripts/place_mt.js"></script>
 	<link type="text/css" href="${pageContext.request.contextPath}/css/bootstrap.min.css" rel="stylesheet">
 	<link type="text/css" href="${pageContext.request.contextPath}/css/default.css" rel="stylesheet">
 	<link type="text/css" href="${pageContext.request.contextPath}/css/normalize.css" rel="stylesheet">
 	<link type="text/css" href="${pageContext.request.contextPath}/css/fileinput.css" rel="stylesheet" media="all">
-
+	
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript">
 	function deleteOne(value){
@@ -52,7 +53,7 @@
 					<td>标题：<input type="text" name="title">&nbsp;</td>
 					<td>电话：<input type="text" name="phone">&nbsp;</td>
 					<td>服务类型：<select id="sltStyle">
-									<c:forEach items="${livesType }" var="type">
+									<c:forEach items="${dailyLivesType }" var="type">
 										<option value="${type.id }">${type.style }</option>	
 									</c:forEach>
 								</select>&nbsp;
@@ -77,7 +78,9 @@
 								<tr>
 									<td colspan="4">
 										<span>${daily.title }</span>&nbsp;&nbsp;&nbsp;&nbsp;
-										<span><input type="button" class="btn" id="btnDelete" onclick="javascript:deleteOne(this)" name="${daily.guid }" value="删除"></span>
+										<span><input type="button" class="btn btn-danger" id="btnDelete" onclick="javascript:deleteOne(this)" name="${daily.guid }" value="删除"></span>
+										<a class="btn btn-large btn-primary" 
+										href="${pageContext.request.contextPath}/dailyLives/jumptoedit.do?guid=${daily.guid}">修改</a>
 									</td>
 								</tr>
 								<tr>
@@ -104,9 +107,11 @@
 					<tr>
 						<td>
 							<div style="text-align:right">
-								<c:forEach items="${daily.images }" var="img">
-									<img src="${img }">
-								</c:forEach>
+								<c:if test="${daily.images.size()>1 }">
+									<c:forEach items="${daily.images }" var="img">
+										<img src="${img }" width="100px" height="150px">
+									</c:forEach>
+								</c:if>
 							</div>
 						</td>
 					</tr>

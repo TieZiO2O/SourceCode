@@ -28,6 +28,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       	 <br>
       	 <li><a href="${pageContext.request.contextPath}/user/update.do" target="right">修改信息</a></li>
       	 <br>
+      	 <li><a href="${pageContext.request.contextPath}/dailyLives/servicemanage.do" target="right">服务管理</a></li>
+      	 <br>
       	 <li><a href="${pageContext.request.contextPath}/user/gochangepwd.do" target="right">修改密码</a></li>
       	 <br>
       	 <li><a href="${pageContext.request.contextPath}/user/end.do" target="_top">注销</a></li>

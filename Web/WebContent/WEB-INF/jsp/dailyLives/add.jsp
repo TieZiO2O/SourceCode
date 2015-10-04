@@ -128,11 +128,21 @@
 			</tr>
 			<tr>
 				<td>是否在首页显示：</td>
-				<td colspan="3">
+				<td>
 					<span>
 						<input onclick="javascript:showMain(this)" type="radio" name="isMainList" value="false" checked>主列表不显示
 						&nbsp;
 						<input onclick="javascript:showMain(this)" type="radio" name="isMainList" value="true">主列表显示
+					</span>
+				</td>
+				<td>选择商户：</td>
+				<td>
+					<span>
+						<select name="shopper" id="shopper" >
+	               			<c:forEach items="${users}" var="user">
+               					<option value="${user.getId()}">${user.getRealName()}</option>
+	               			</c:forEach>
+               			</select>
 					</span>
 				</td>
 			</tr>

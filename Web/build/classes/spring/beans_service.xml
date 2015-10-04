@@ -14,7 +14,7 @@
 		<property name="uri"
 			value="jdbc:mysql://127.0.0.1:3306/community?useUnicode=true&amp;characterEncoding=utf-8" />
 		<property name="userName" value="root" />
-		<property name="password" value="" />
+		<property name="password" value="root" />
 
 		<!-- <property name="password" value="luxing" /> -->
 	</bean>
