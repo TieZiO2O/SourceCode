@@ -234,7 +234,7 @@ public class ForumThreadController {
 				File localFile=new File(fileUrl);
 				try {
 					file.transferTo(localFile);
-				} catch (IllegalStateException | IOException e) {
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -331,7 +331,7 @@ public class ForumThreadController {
 	}
 	
 	@RequestMapping("getAllByUid")
-	public void getAllByUid(String uid,HttpServletResponse response,PrintWriter pw){
+	public void getAllByUid(String uid,HttpServletRequest request,HttpServletResponse response,PrintWriter pw){
 		JSONObject json=new JSONObject();
 		ArrayList<ForumThreads> fts=null;
 
@@ -345,8 +345,23 @@ public class ForumThreadController {
 			return;
 		}
 		
-		fts=this.forumThreadDaoImpl.queryAllByUid(uid);
-		
+		String pindex=request.getParameter("pindex");
+		String psize=request.getParameter("psize");
+		if(pindex==null || pindex.equals("")){
+			fts=this.forumThreadDaoImpl.queryAllByUid(uid);
+		}else{
+			int pstart=(Integer.parseInt(pindex)-1)*Integer.parseInt(psize);
+			fts=this.forumThreadDaoImpl.queryAllByUid_Paging(uid, pstart, Integer.parseInt(psize));
+			int totalCount=this.forumThreadDaoImpl.queryAllByUid_Count(uid);
+			int pbooks=totalCount/Integer.parseInt(psize);
+			//获取所有行的余数
+			int yushu=totalCount%Integer.parseInt(psize);
+			if(yushu>0){
+				pbooks=pbooks+1;
+			}
+			//设置页数
+			json.put("pbooks", pbooks);
+		}
 		json.put("result", "success");
 		json.put("info", fts);
 		pw.write(json.toString());
@@ -355,14 +370,21 @@ public class ForumThreadController {
 	}
 	
 	@RequestMapping("getAll")
-	public void getAll(HttpServletResponse response,PrintWriter pw){
+	public void getAll(HttpServletRequest request,HttpServletResponse response,PrintWriter pw){
 		JSONObject json=new JSONObject();
 		ArrayList<ForumThreads> fts=null;
 
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html;charset:utf-8");
 		
-		fts=this.forumThreadDaoImpl.queryAll();
+		String pindex=request.getParameter("pindex");
+		String psize=request.getParameter("psize");
+		if(pindex==null || pindex.equals("")){
+			fts=this.forumThreadDaoImpl.queryAll();
+		}else{
+			int pstart=(Integer.parseInt(pindex)-1)*Integer.parseInt(psize);
+			fts=this.forumThreadDaoImpl.queryAll_Paging(pstart, Integer.parseInt(psize));
+		}
 		
 		json.put("result", "success");
 		json.put("info", fts);

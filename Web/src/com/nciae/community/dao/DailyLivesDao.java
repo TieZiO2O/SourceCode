@@ -7,6 +7,7 @@ import java.util.List;
 import com.nciae.community.domain.DailyLives;
 import com.nciae.community.domain.DailyLivesType;
 import com.nciae.community.domain.ForumThreads;
+import com.nciae.community.domain.Users;
 public interface DailyLivesDao {
 	public DailyLives queryByGuid(String guid);
 	public ArrayList<DailyLives> queryAll();
@@ -15,9 +16,18 @@ public interface DailyLivesDao {
 	public boolean addNewUser_DailyLives(DailyLives forumThread) throws Exception;
 	public ArrayList<DailyLivesType> SelectAllDailyLivesTypes();
 	/*public ArrayList<DailyLivesType> queryAllButUsed();*/
-	public ArrayList<DailyLives> queryAllByServiceType(int typeId);
+	/*public ArrayList<DailyLives> queryAllByServiceType(int typeId);*/
 	public boolean addNewDailyLivesType(DailyLivesType dlv);
 	boolean delete_DailyLivesType_ById(int id);
 	boolean delete_DailyLives_ById(String guid);
-	ArrayList<DailyLives> query_By_titleorphone(String title, String phone);
+	ArrayList<DailyLives> query_By_titleorphone(String title, String phone,String typeId);
+	/*ArrayList<DailyLives> queryAllByServiceType(int typeId, String comId);*/
+	ArrayList<DailyLives> query_By_titleorphone_notAdmin(String title,String phone,String uid,String typeId);
+	boolean update(DailyLives dl);
+	
+	ArrayList<DailyLives> queryAllByServiceType_Paging(int typeId, int comId,
+			int pindex, int psize);
+	ArrayList<DailyLives> queryAllByServiceType(int typeId, int comId);
+	boolean deleteImgs(String guid);
+	ArrayList<Users> queryAllShopUsers();
 }

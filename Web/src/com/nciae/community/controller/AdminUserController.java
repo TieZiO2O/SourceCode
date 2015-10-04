@@ -32,6 +32,7 @@ import com.nciae.community.dao.impl.UsersDaoImpl;
 import com.nciae.community.domain.Advertisement;
 import com.nciae.community.domain.Community;
 import com.nciae.community.domain.DailyAbc;
+import com.nciae.community.domain.DailyLivesType;
 import com.nciae.community.domain.HappyMoment;
 import com.nciae.community.domain.Reply;
 import com.nciae.community.domain.Users;
@@ -341,47 +342,24 @@ public class AdminUserController {
 	@SuppressWarnings("static-access")
 	@RequestMapping(value = "shopper_addOpt2", method = RequestMethod.POST)
 	public @ResponseBody
-	void addOptShopper2(@RequestBody String msg, PrintWriter out) {
+	void addOptShopper2(@RequestBody String msg, PrintWriter out,HttpServletRequest request) {
 		ArrayList<Users> aList = null;//
-		// PrintWriter out = null;
 		String result = "";
 		JSONObject jo = null;
 		try {
-			// String msgstr=new
-			// String(request.getParameter("msgstr").trim().getBytes("ISO-8859-1"),"UTF-8");
-			// String msgstr=request.getParameter("msg");
 
 			ObjectMapper objectMapper = new ObjectMapper();
 			Users u = objectMapper.configure(
 					DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 					.readValue(msg, Users.class);
-			/////////////0626
-			//mempassword = MD5.Instance().RMD5(request.getParameter("password"));
 			u.setUserPwd(MD5.Instance().RMD5("000000nciae"));
-			// Users u = objectMapper.readValue(msg, Users.class);
-			// out = response.getWriter();
-
-			// MultipartFile file = multiRequest.getFile(iter.next());
-			// String fileName = u.getShopLogo();
-			// String path ="H:/tempImg/" +fileName;
-			// File localFile = new File(path);
-			// MultipartFile.transferTo(localFile);
-
 			if (usersDaoImpl.addShopUser(u)) {
 				System.out.println(msg);
-				// request.setAttribute("shoppers", null);
-				// request.setAttribute("result",
-				// "<font color='green'>添加成功</font>");
-				// return "adminusers/shopper";
 				result = "success";
 				jo = new JSONObject();
 				jo.put(result, true);
 				out.write(jo.toString());
 			} else {
-				// request.setAttribute("shoppers", null);
-				// request.setAttribute("result",
-				// "<font color='red'>添加失败</font>");
-				// return "adminusers/shopper";
 				result = "error";
 				jo = new JSONObject();
 				jo.put(result, false);

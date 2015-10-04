@@ -171,6 +171,93 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 		return fts;
 	}
 
+	@Override
+	public ArrayList<ForumThreads> queryAllByUid_Paging(String uid,int pindex,int psize) {
+		// TODO Auto-generated method stub
+		String sql="SELECT ft.id,ft.guid,uf.userId,"
+				+ "ft.title,ft.content,ft.createDate,ft.phone from "
+				+ "users_forumthreads uf inner join "
+				+ "forumthreads ft on uf.forumThreadsGuid=ft.guid "
+				+ "where uf.userId=? order by ft.createDate desc limit ?,?";
+		
+		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		ArrayList<ForumThreads> fts=null;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(1, uid);
+			ps.setInt(2, pindex);
+			ps.setInt(3, psize);
+			rs=ps.executeQuery();
+		
+			fts=new ArrayList<ForumThreads>();
+			while(rs.next()){
+				ForumThreads ft=new ForumThreads();
+				ft.setId(rs.getInt("id"));
+				ft.setUid(rs.getString("userId"));
+				ft.setGuid(rs.getString("guid"));
+				ft.setPhone(rs.getString("phone"));
+				ft.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rs.getString("createDate")));
+				ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+				String content=rs.getString("content");
+				ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
+				fts.add(ft);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			fts=null;
+		}finally{
+			if(ps!=null){
+				try {
+					ps.close();
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return fts;
+	}
+	
+	public int queryAllByUid_Count(String uid) {
+		// TODO Auto-generated method stub
+		String sql="select count(*) as totalCount from (SELECT count(*) from"
+				+ " users_forumthreads uf inner join"
+				+ " forumthreads ft on uf.forumThreadsGuid=ft.guid"
+				+ " where uf.userId=? group by ft.id) dd";
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		int fts=-1;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			ps.setString(1, uid);
+			rs=ps.executeQuery();
+		
+			fts=rs.getInt("totalCount");
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			fts=-1;
+		}finally{
+			if(ps!=null){
+				try {
+					ps.close();
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return fts;
+	}
+	
+	@Override
 	public ArrayList<ForumThreads> queryAll() {
 		// TODO Auto-generated method stub
 		String sql="SELECT ft.id,ut.userId,m.memLogName,ft.guid,ft.title,ft.content,ft.phone,ft.createDate,"
@@ -186,6 +273,64 @@ public class ForumThreadDaoImpl implements ForumThreadDao {
 		ArrayList<ForumThreads> fts=null;
 		try {
 			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			rs=ps.executeQuery();
+		
+			fts=new ArrayList<ForumThreads>();
+			while(rs.next()){
+				ForumThreads ft=new ForumThreads();
+				ArrayList<String> strs=new ArrayList<String>();
+				
+				if(rs.getString("imgpath")!=null){
+					strs.add(this.webUrl+rs.getString("imgpath"));
+				}
+				ft.setImages(strs);
+				ft.setId(rs.getInt("id"));
+				ft.setUid(rs.getString("userId"));
+				ft.setGuid(rs.getString("guid"));
+				ft.setPhone(rs.getString("phone"));
+				ft.setUserName(rs.getString("memLogName"));
+				ft.setCreateDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(rs.getString("createDate")));
+				ft.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
+				String content=rs.getString("content");
+				ft.setContent(content!=null?new String(base64.decode(rs.getString("content")),"utf-8"):"");
+				fts.add(ft);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			fts=null;
+		}finally{
+			if(ps!=null){
+				try {
+					ps.close();
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return fts;
+	}
+	
+	@Override
+	public ArrayList<ForumThreads> queryAll_Paging(int pindex,int psize) {
+		// TODO Auto-generated method stub
+		String sql="SELECT ft.id,ut.userId,m.memLogName,ft.guid,ft.title,ft.content,ft.phone,ft.createDate,"
+				+" fti.imgpath from users_forumthreads ut INNER join member m on ut.userId=m.id "
+				+ "LEFT JOIN forumthreads ft on ut.forumThreadsGuid=ft.guid"
+				+" LEFT join forumtheads_img fti on ft.guid=fti.forumthreadsguid where ft.isUsed=true"
+				+" GROUP BY ft.guid ORDER BY ft.createDate desc limit ?,?";
+
+		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+		
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		ArrayList<ForumThreads> fts=null;
+		try {
+			ps=this.dbServiceImpl.connect().prepareStatement(sql);
+			ps.setInt(1, pindex);
+			ps.setInt(2, psize);
 			rs=ps.executeQuery();
 		
 			fts=new ArrayList<ForumThreads>();

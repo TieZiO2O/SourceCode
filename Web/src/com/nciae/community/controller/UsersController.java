@@ -49,6 +49,7 @@ public class UsersController {
 				
 				session.setAttribute("userid",usersDaoImpl.selectShopUserId(username));
 				session.setAttribute("username",username);
+				session.setAttribute("type", Users.ROLE_ADMIN);
 				//System.out.print("1111111111111111111");
 				return "main_admin";
 				
@@ -56,12 +57,14 @@ public class UsersController {
 				
 				session.setAttribute("userid",usersDaoImpl.selectShopUserId(username));
 				session.setAttribute("username",username);
+				session.setAttribute("type", Users.ROLE_SHOP);
 				//System.out.print("222222222222222222");
 				return "main_shop";
 			}
 			else if(role.equals(Users.ROLE_PROPERTY)){
 				session.setAttribute("userid",usersDaoImpl.selectShopUserId(username));
 				session.setAttribute("username",username);
+				session.setAttribute("type", Users.ROLE_PROPERTY);
 				return "main_property";
 			}
 			else

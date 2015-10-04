@@ -14,4 +14,6 @@ public interface ForumThreadDao {
 	public ArrayList<ForumThreads> queryAll();
 	public boolean query_IsBelong(String uid,String guid);
 	public boolean delete_By_Guid(String guid);
+	ArrayList<ForumThreads> queryAllByUid_Paging(String uid,int pindex,int psize);
+	ArrayList<ForumThreads> queryAll_Paging(int pindex, int psize);
 }

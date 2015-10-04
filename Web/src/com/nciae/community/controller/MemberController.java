@@ -582,12 +582,17 @@ public class MemberController {
 	public void mem_selectADs(HttpServletRequest request,
 			HttpServletResponse response) {
 		try {
-			Integer communityid = Integer.parseInt(request.getParameter(
-					"communityid").trim());
+			String cid=request.getParameter(
+					"communityid");
+			if(cid!=null){
+				cid= cid.trim();
+			}else{
+				cid="";
+			}
 			String result = null;
 			PrintWriter out = null;
 			ArrayList<Object> adlist = new ArrayList<Object>();
-			adlist = memberDaoImpl.selectAdvertisements(communityid);
+			adlist = memberDaoImpl.selectAdvertisements(cid);
 			if (adlist != null) {
 				result = JsonUtil.toJsonString(adlist);
 			} else {

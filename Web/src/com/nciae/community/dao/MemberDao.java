@@ -120,7 +120,7 @@ public boolean chkAlreadyCollection(String guid, int memberid) throws Exception;
  * @return
  */
 //public ArrayList<Object> selectAdvertisements()throws Exception;
-public ArrayList<Object> selectAdvertisements(int communityid) throws Exception;
+public ArrayList<Object> selectAdvertisements(String communityid) throws Exception;
 /**
  * 查询特定ID的商户信息
  * @param shopid

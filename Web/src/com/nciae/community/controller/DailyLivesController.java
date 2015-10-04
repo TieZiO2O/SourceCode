@@ -13,12 +13,14 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONObject;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -27,6 +29,7 @@ import com.nciae.community.dao.impl.DailyLivesDaoImpl;
 import com.nciae.community.domain.DailyLives;
 import com.nciae.community.domain.DailyLivesType;
 import com.nciae.community.domain.DailyLives_SeperateTypes;
+import com.nciae.community.domain.Users;
 
 @Controller
 @RequestMapping("dailyLives")
@@ -66,6 +69,11 @@ public class DailyLivesController {
 		dailyLives.setMainList(isMainList);
 		//获取小区集合
 		String communtiys=request.getParameter("hidCom");
+		if(communtiys.length()>0){
+			if(!communtiys.contains(",")){
+				communtiys+=",";
+			}
+		}
 		dailyLives.setCommunitys(communtiys);
 		
 		try {
@@ -82,7 +90,7 @@ public class DailyLivesController {
 			e1.printStackTrace();
 		}
 		HttpSession session=request.getSession();
-		String userId=session.getAttribute("userid").toString();
+		String userId=request.getParameter("shopper");
 		dailyLives.setPhone(request.getParameter("phone"));
 		dailyLives.setAddress(request.getParameter("address"));
 		dailyLives.setUid(userId);
@@ -158,7 +166,7 @@ public class DailyLivesController {
 				File localFile=new File(fileUrl);
 				try {
 					file.transferTo(localFile);
-				} catch (IllegalStateException | IOException e) {
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -244,6 +252,10 @@ public class DailyLivesController {
 	@RequestMapping("getAllServiceTypeBySid")
 	public void GetAllServiceTypeByServiceId(HttpServletRequest request,PrintWriter pw){
 		String id=request.getParameter("sid");
+		String comId=request.getParameter("communityId");	//获取小区的id
+		String pindex=request.getParameter("pindex");
+		String psize=request.getParameter("psize");
+		
 		JSONObject json=new JSONObject();
 		if(id==""){
 			json.put("result", "fail");
@@ -252,10 +264,64 @@ public class DailyLivesController {
 			return;
 		}
 		
-		ArrayList<DailyLives> dls=this.dailyLivesDaoImpl.queryAllByServiceType(Integer.parseInt(id));
+		//获取所有有关该sid的小区
+		ArrayList<DailyLives> dls=null;
+		if(pindex==null || pindex.equals("") ){
+			System.out.println("没有分页");
+			if(comId==null || comId.equals("")){
+				dls=this.dailyLivesDaoImpl.queryAllByServiceType(Integer.parseInt(id),-1);
+			}else{
+				dls=this.dailyLivesDaoImpl.queryAllByServiceType(Integer.parseInt(id),Integer.parseInt(comId));
+			}
+		}else{
+			//计算得出数据的起始位置
+			int pstart=(Integer.parseInt(pindex)-1)*Integer.parseInt(psize);
+			//获取总行数
+			int totalCount=this.dailyLivesDaoImpl.queryAllByServiceType_Count(Integer.parseInt(id),Integer.parseInt(comId));
+			if(comId==null || comId.equals("")){
+				dls=this.dailyLivesDaoImpl.queryAllByServiceType_Paging(Integer.parseInt(id),-1
+						,Integer.parseInt(pindex),Integer.parseInt(psize));
+			}else{
+				dls=this.dailyLivesDaoImpl.queryAllByServiceType_Paging(Integer.parseInt(id),Integer.parseInt(comId)
+						,Integer.parseInt(pindex),Integer.parseInt(psize));
+			}
+			
+			int pbooks=totalCount/Integer.parseInt(psize);
+			int yushu=totalCount%Integer.parseInt(psize);
+			if(yushu>0){
+				pbooks=pbooks+1;
+			}
+			//设置页数
+			json.put("pbooks", pbooks);
+		}
 		
-		json.put("result", "success");
+		
+		/*boolean isSurround=false;
+		if(dls!=null){
+			if(dls.get(0).getDailyLivesType().getStyle().equals("周边服务")){
+				isSurround=true;
+			}
+		}
+		if(isSurround){
+			ArrayList<DailyLives> returnData=new ArrayList<DailyLives>();
+			for (DailyLives dailyLives : dls) {
+				String[] ids=dailyLives.getCommunitys().split(",");
+				for (String string : ids) {
+					if(string==comId){
+						returnData.add(dailyLives);
+					}
+				}
+				if(dailyLives.getCommunitys().equals("")){
+					returnData.add(dailyLives);
+				}
+			}	
+			json.put("info",returnData);
+		}else{
+			json.put("info",dls);
+		}*/
 		json.put("info",dls);
+		json.put("result", "success");
+		
 		pw.write(json.toString());
 		
 		return;
@@ -329,7 +395,7 @@ public class DailyLivesController {
 				File newFile=new File(fileRealPath);
 				try {
 					file.transferTo(newFile);
-				} catch (IllegalStateException | IOException e) {
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -373,12 +439,15 @@ public class DailyLivesController {
 		return "dailyLives/addservicetype";
 	}
 	
+	
 	@RequestMapping("addservicestyle")
 	public String jumpToaddstyle(HttpServletRequest request){
 		ArrayList<DailyLivesType> dailys=this.dailyLivesDaoImpl.SelectAllDailyLivesTypes();
+		ArrayList<Users> users=this.dailyLivesDaoImpl.queryAllShopUsers();
 		
 		if(dailys!=null){
 			request.setAttribute("dailys", dailys);
+			request.setAttribute("users", users);
 		}
 		return "dailyLives/add";
 	}
@@ -388,16 +457,43 @@ public class DailyLivesController {
 		String title=request.getParameter("title")==null ?"":request.getParameter("title");
 		String phone=request.getParameter("phone")==null?"":request.getParameter("phone");
 		
-		ArrayList<DailyLives> lives= this.dailyLivesDaoImpl.query_By_titleorphone(title, phone);
+		HttpSession session=request.getSession();
+		String type=(String) session.getAttribute("type");
+		Object uid=session.getAttribute("userid");
+		ArrayList<DailyLives> lives=null;
+		if(type!=Users.ROLE_ADMIN){
+			lives=this.dailyLivesDaoImpl.query_By_titleorphone_notAdmin(title, phone, uid.toString(),"");
+		}else{
+			lives= this.dailyLivesDaoImpl.query_By_titleorphone(title, phone,"");
+		}
+		
+		
 		ArrayList<DailyLivesType> livesType=this.dailyLivesDaoImpl.SelectAllDailyLivesTypes();
 		request.setAttribute("dailyLives", lives);
 		request.setAttribute("dailyLivesType", livesType);
 		return "dailyLives/servicemanage";
 	}
 	
+	
 	@RequestMapping("service")
 	public String serviceJump(){
 		return "dailyLives/service";
+	}
+	
+	@RequestMapping(value="jumptoedit",method=RequestMethod.GET)
+	public String jumpToEdit(HttpServletRequest request){
+		try {
+			request.setCharacterEncoding("utf-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		DailyLives dl=new DailyLives();
+		dl=this.dailyLivesDaoImpl.queryByGuid(request.getParameter("guid"));
+		
+		request.setAttribute("imgcount",dl.getImages().size());
+		request.setAttribute("daily",dl);
+		return "dailyLives/edit";
 	}
 	
 	public DailyLivesDaoImpl getDailyLivesDaoImpl() {
@@ -420,6 +516,71 @@ public class DailyLivesController {
 		}
 		
 		boolean result=this.dailyLivesDaoImpl.delete_DailyLives_ById(guid);
+		if(result){
+			json.put("result","success");
+			json.put("info","删除成功");
+		}else{
+			json.put("result","fail");
+			json.put("info","删除失败");
+		}
+		pw.write(json.toString());
+		return;
+	}
+	@RequestMapping("edit")
+	public String editOne(HttpServletRequest request,HttpServletResponse response){
+		try {
+			request.setCharacterEncoding("utf-8");
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		PrintWriter pw=null;
+		try {
+			pw = response.getWriter();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		org.apache.tomcat.util.codec.binary.Base64 base64=new org.apache.tomcat.util.codec.binary.Base64();
+		DailyLives dl=new DailyLives();
+		String guid=request.getParameter("guid");
+		dl.setGuid(guid);
+		
+		String title=request.getParameter("title");
+		String phone=request.getParameter("phone");
+		String address=request.getParameter("address");
+		String customerNotice=request.getParameter("customerNotice");
+		String content=request.getParameter("content");
+		
+		dl.setAddress(address);
+		try {
+			dl.setTitle(new String(base64.encode(title.getBytes("utf-8"))));
+			dl.setContent(new String(base64.encode(content.getBytes("utf-8"))));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		dl.setPhone(phone);
+		dl.setCustomerNotice(customerNotice);
+		
+		this.dailyLivesDaoImpl.update(dl);
+		ArrayList<String> imgs=this.AddImages(request, guid);
+		boolean result=this.dailyLivesDaoImpl.addDailyLivesImgs(imgs, guid);
+		
+		return this.serviceManage(request,pw);
+	}
+	@RequestMapping("delete_imgs")
+	public void DeleteDailyLivesImgsByGuid(HttpServletRequest request,PrintWriter pw){
+		String guid=request.getParameter("guid");
+		JSONObject json=new JSONObject();
+		if(guid.equals("")){
+			json.put("result","fail");
+			json.put("info","guid，不能为空");
+			pw.write(json.toString());
+			return;
+		}
+		
+		boolean result=this.dailyLivesDaoImpl.deleteImgs(guid);
 		if(result){
 			json.put("result","success");
 			json.put("info","删除成功");

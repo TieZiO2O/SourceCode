@@ -1016,7 +1016,7 @@ public class MemberDaoImpl implements MemberDao {
 	
 	//查询广告
 	@Override
-	public ArrayList<Object> selectAdvertisements(int communityid)
+	public ArrayList<Object> selectAdvertisements(String communityid)
 			throws Exception {
 		ResultSet rs = null;
 		String communitystringid;
@@ -1025,11 +1025,11 @@ public class MemberDaoImpl implements MemberDao {
 		try {
 			String sql ="select dl.id,dl.guid,dl.customerNotice,dl.address,"
 					+ "dl.phone,dl.title,dl.content,dl.communitys,di.img_path"
-					 +" from dailylives dl INNER join dailylives_img di on "
+					 +" from dailylives dl left join dailylives_img di on "
 					 + "dl.guid=di.dailylives_guid where dl.isUsed=true and dl.isMainList=true "
-					 + "and (LOCATE(?,communitys)>0  or LENGTH(Trim(communitys))<1 or communitys is null) order by dl.id"; //"select * from dailylives where isMainList=true";
+					 + "and (LOCATE(?,communitys)>0  or LENGTH(Trim(communitys))<1 or communitys is null) group BY dl.id order by dl.id"; //"select * from dailylives where isMainList=true";
 			ps = dbServiceImpl.connect().prepareStatement(sql);
-			ps.setString(1, new String().valueOf(communityid));
+			ps.setString(1, communityid);
 			rs = ps.executeQuery();
 			list = new ArrayList<Object>();
 			
@@ -1045,11 +1045,12 @@ public class MemberDaoImpl implements MemberDao {
 					ad.setImages(imgs);
 					ad.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
 					ad.setContent(new String(base64.decode(rs.getString("content")),"utf-8"));
+					ad.setCustomerNotice(rs.getString("customerNotice"));
 					list.add(ad);
 				} else {
 					String communitystring[] = communitystringid.split(",");
 					for (int i = 0; i < communitystring.length; i++) {
-						String community = Integer.toString(communityid);
+						String community = communityid;
 						if (community.equals(communitystring[i])) {
 							DailyLives ad = new DailyLives();
 							ad.setGuid(rs.getString("guid"));
@@ -1057,6 +1058,7 @@ public class MemberDaoImpl implements MemberDao {
 							ad.setImages(imgs);
 							ad.setTitle(new String(base64.decode(rs.getString("title")),"utf-8"));
 							ad.setContent(new String(base64.decode(rs.getString("content")),"utf-8"));
+							ad.setCustomerNotice(rs.getString("customerNotice"));
 							list.add(ad);
 						}
 					}
@@ -1146,6 +1148,7 @@ public class MemberDaoImpl implements MemberDao {
 			}
 			return list;
 		}
+
 
 
 }
